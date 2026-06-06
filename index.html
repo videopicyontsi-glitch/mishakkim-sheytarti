@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>אלופי הקיץ 🏆</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#f7c948;--orange:#ff8c42;--teal:#00b4d8;--green:#6bffb8;--bg1:#0a0e1a;--card:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.1);--text:rgba(255,255,255,0.85);--muted:rgba(255,255,255,0.4);}
+html,body{height:100%;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg1);color:var(--text);overflow-x:hidden;}
+.screen{display:none;flex-direction:column;min-height:100vh;overflow-y:auto;}
+.screen.active{display:flex;}
+
+/* AUTH */
+#authScreen{align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0e1a,#111827,#0f2a4a);padding:20px;}
+.auth-box{background:rgba(255,255,255,0.07);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:24px;padding:38px 28px;width:100%;max-width:380px;text-align:center;}
+.app-logo{font-size:52px;margin-bottom:8px;animation:float 2s infinite alternate;}
+@keyframes float{from{transform:translateY(0);}to{transform:translateY(-9px);}}
+.app-title{font-size:26px;font-weight:900;background:linear-gradient(90deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:3px;}
+.app-sub{color:var(--muted);font-size:13px;margin-bottom:24px;}
+.field{margin-bottom:12px;text-align:right;}
+.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px;font-weight:600;}
+.field input,.field select{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid var(--border);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;outline:none;transition:.2s;font-family:inherit;}
+.field input:focus,.field select:focus{border-color:var(--gold);}
+.field select option{background:#111827;}
+.btn{width:100%;padding:12px;border-radius:10px;border:none;font-size:15px;font-weight:800;cursor:pointer;transition:.15s;font-family:inherit;}
+.btn-gold{background:linear-gradient(90deg,var(--gold),var(--orange));color:#0a0e1a;}
+.btn-gold:active{transform:scale(.97);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+.err{color:#ff6b6b;font-size:12px;margin-top:6px;min-height:15px;}
+.tabs{display:flex;gap:7px;margin-bottom:20px;}
+.tab{flex:1;padding:9px;border-radius:9px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit;}
+.tab.active{background:var(--gold);color:#0a0e1a;border-color:var(--gold);}
+.mt8{margin-top:8px;}
+
+/* TOP BAR */
+.top-bar{background:rgba(10,14,26,0.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#0a0e1a;flex-shrink:0;}
+.user-name{font-weight:700;font-size:13px;}
+.user-pts{color:var(--gold);font-size:11px;font-weight:600;}
+.hdate-bar{background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);padding:5px 14px;text-align:center;font-size:12px;color:var(--muted);}
+.hdate-bar span{color:var(--gold);font-weight:700;}
+.icon-btn{background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:9px;padding:6px 11px;cursor:pointer;font-size:12px;color:var(--text);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,26,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;z-index:100;}
+.nav-item{flex:1;padding:9px 4px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:inherit;}
+.nav-item.active{color:var(--gold);}
+.nav-item .nav-icon{font-size:19px;}
+.nav-item .nav-label{font-size:10px;font-weight:600;}
+
+/* CONTENT */
+.content{flex:1;padding:13px;padding-bottom:82px;max-width:600px;width:100%;margin:0 auto;}
+
+/* PROGRESS */
+.progress-card{background:linear-gradient(135deg,rgba(247,201,72,0.1),rgba(255,140,66,0.06));border:1px solid rgba(247,201,72,0.18);border-radius:18px;padding:15px;margin-bottom:13px;}
+.progress-bar-wrap{background:rgba(255,255,255,0.08);border-radius:100px;height:10px;overflow:hidden;margin:7px 0;}
+.progress-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--gold),var(--orange));transition:width .5s;}
+.progress-stats{display:flex;justify-content:space-between;align-items:baseline;}
+.pts-big{font-size:20px;font-weight:900;color:var(--gold);}
+
+/* RANK */
+.rank-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:11px;padding:7px 12px;margin-bottom:13px;}
+
+/* TIME BANNER */
+.time-banner{border-radius:14px;padding:11px 14px;margin-bottom:13px;display:flex;align-items:center;gap:11px;}
+.time-banner.shacharit{background:rgba(255,201,72,0.09);border:1px solid rgba(255,201,72,0.18);}
+.time-banner.mincha{background:rgba(0,180,216,0.09);border:1px solid rgba(0,180,216,0.18);}
+.time-banner.arvit{background:rgba(107,107,255,0.09);border:1px solid rgba(107,107,255,0.18);}
+.time-banner.shabbat{background:rgba(107,255,184,0.09);border:1px solid rgba(107,255,184,0.18);}
+.tb-title{font-weight:800;font-size:14px;}
+.tb-sub{font-size:12px;color:var(--muted);}
+.pulse{animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* BONUS */
+.bonus-card{background:linear-gradient(135deg,rgba(107,255,184,0.08),rgba(0,180,216,0.05));border:1px solid rgba(107,255,184,0.18);border-radius:15px;padding:12px 15px;margin-bottom:13px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:.15s;}
+.bonus-card:active{transform:scale(.98);}
+.bonus-card.done-bonus{opacity:.5;cursor:default;}
+.bonus-pts{font-size:16px;font-weight:900;color:var(--green);margin-right:auto;}
+
+/* CATEGORIES */
+.cat-section{margin-bottom:13px;}
+.cat-header{display:flex;align-items:center;gap:9px;margin-bottom:8px;cursor:pointer;padding:3px 0;}
+.cat-title{font-weight:800;font-size:14px;flex:1;}
+.cat-progress{font-size:11px;color:var(--muted);}
+.cat-toggle{color:var(--muted);font-size:14px;}
+.cat-tasks{display:flex;flex-direction:column;gap:6px;}
+.cat-tasks.collapsed{display:none;}
+
+/* TASK ITEMS */
+.task-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:.15s;user-select:none;position:relative;overflow:hidden;}
+.task-item:active{transform:scale(.98);}
+/* DONE */
+.task-item.checked{background:rgba(107,255,184,0.07);border-color:rgba(107,255,184,0.3);border-right:4px solid var(--green);cursor:default;}
+.task-item.checked:active{transform:none;}
+.task-done-v{width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#0a0e1a;flex-shrink:0;}
+/* prayer states */
+.task-item.prayer-current{border-color:rgba(247,201,72,0.4);background:rgba(247,201,72,0.06);}
+.task-item.prayer-current::before{content:'עכשיו';position:absolute;top:0;left:0;background:var(--gold);color:#0a0e1a;font-size:9px;font-weight:900;padding:2px 7px;border-radius:0 0 7px 0;}
+.task-item.prayer-future{opacity:.6;}
+.task-item.prayer-future::before{content:'טרם הזמן';position:absolute;top:0;left:0;background:rgba(255,255,255,0.1);color:var(--muted);font-size:9px;font-weight:700;padding:2px 7px;border-radius:0 0 7px 0;}
+.task-item.prayer-past{opacity:.4;cursor:default;}
+.task-item.prayer-past:active{transform:none;}
+.task-item.prayer-past::before{content:'⏰ חלף';position:absolute;top:0;left:0;background:rgba(255,107,107,0.2);color:#ff8080;font-size:9px;font-weight:700;padding:2px 7px;border-radius:0 0 7px 0;}
+.task-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:.2s;}
+.task-item.checked .task-check{background:var(--green);border-color:var(--green);color:#0a0e1a;font-weight:900;}
+.task-name{flex:1;font-size:13px;font-weight:600;}
+.task-item.checked .task-name{color:var(--muted);text-decoration:line-through;}
+.task-pts{font-size:11px;font-weight:700;color:var(--gold);background:rgba(247,201,72,0.1);border-radius:5px;padding:2px 6px;flex-shrink:0;}
+.task-item.checked .task-pts{color:var(--muted);background:rgba(255,255,255,0.04);}
+.task-iicon{font-size:14px;}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(5px);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:8px;}
+.modal-overlay.open{display:flex;}
+.modal-card{background:linear-gradient(160deg,#131c30,#0e1525);border:1px solid rgba(255,255,255,0.12);border-radius:22px 22px 18px 18px;padding:20px 18px 24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-header{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+.modal-badge{font-size:22px;}
+.modal-badge-text{font-weight:800;font-size:14px;flex:1;}
+.modal-close{background:rgba(255,255,255,0.07);border:none;color:var(--muted);font-size:16px;width:28px;height:28px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-hdate{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.modal-title{font-size:15px;font-weight:800;color:var(--gold);margin-bottom:9px;}
+
+/* mishna cards */
+.mishna-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:7px;}
+.mishna-num{font-size:10px;color:var(--teal);font-weight:700;margin-bottom:4px;}
+.mishna-text{font-size:13.5px;line-height:1.9;color:var(--text);}
+.mishna-summary{font-size:11px;color:var(--muted);margin-top:5px;font-style:italic;}
+
+/* single content */
+.modal-text{font-size:13.5px;line-height:1.85;background:rgba(255,255,255,0.03);border-radius:11px;padding:13px;margin-bottom:9px;border:1px solid var(--border);}
+.modal-summary{font-size:12px;color:var(--teal);font-weight:600;margin-bottom:14px;padding:6px 10px;background:rgba(0,180,216,0.07);border-radius:8px;}
+.modal-video-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;padding:13px;margin-bottom:13px;text-align:center;}
+.btn-watch{display:inline-block;background:rgba(200,0,0,0.85);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:9px;text-decoration:none;}
+
+/* QUESTION BOX */
+.question-box{margin-top:12px;background:rgba(247,201,72,0.05);border:1px solid rgba(247,201,72,0.18);border-radius:14px;padding:14px;}
+.question-label{font-size:10px;font-weight:800;color:var(--gold);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px;}
+.question-text{font-size:14px;font-weight:700;margin-bottom:12px;line-height:1.5;}
+
+/* TIMER */
+.timer-wrap{text-align:center;padding:10px 0 14px;}
+.timer-wrap svg{display:block;margin:0 auto 6px;}
+.timer-msg{font-size:12px;color:var(--muted);}
+
+/* ANSWER BUTTONS */
+.answer-btn{display:block;width:100%;text-align:right;padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:rgba(255,255,255,0.04);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:6px;font-family:inherit;transition:.15s;}
+.answer-btn:last-child{margin-bottom:0;}
+.answer-btn:active{transform:scale(.98);}
+.answer-btn.correct{background:rgba(107,255,184,0.12);border-color:rgba(107,255,184,0.45);color:var(--green);pointer-events:none;}
+.answer-btn.wrong{background:rgba(255,107,107,0.12);border-color:rgba(255,107,107,0.35);color:#ff8080;pointer-events:none;}
+.answer-btn.disabled{pointer-events:none;opacity:.45;}
+.answer-result{font-size:13px;font-weight:700;text-align:center;padding:10px;border-radius:9px;margin-top:10px;}
+.answer-result.ok{background:rgba(107,255,184,0.1);color:var(--green);}
+.answer-result.nok{background:rgba(255,107,107,0.1);color:#ff8080;}
+
+/* SPORT */
+.sport-counter{font-size:65px;font-weight:900;color:var(--gold);text-align:center;padding:14px 0 5px;line-height:1;}
+.sport-target{font-size:13px;color:var(--muted);text-align:center;margin-bottom:9px;}
+.sport-tap-btn{width:100%;padding:17px;border-radius:14px;border:2px solid var(--gold);background:rgba(247,201,72,0.07);color:var(--gold);font-size:19px;font-weight:900;cursor:pointer;font-family:inherit;margin-bottom:9px;}
+.sport-tap-btn:active{transform:scale(.95);background:rgba(247,201,72,0.18);}
+
+/* LB */
+.lb-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.lb-item.me{background:rgba(247,201,72,0.07);border-color:rgba(247,201,72,0.25);}
+.lb-rank{width:24px;font-size:13px;font-weight:900;color:var(--muted);text-align:center;}
+.lb-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0;}
+.lb-info{flex:1;}
+.lb-name{font-weight:700;font-size:13px;}
+.lb-rank-name{font-size:10px;color:var(--muted);}
+.lb-pts{font-size:14px;font-weight:900;color:var(--gold);}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:16px;}
+.podium-item{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.podium-av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0a0e1a;}
+.p1 .podium-av{width:56px;height:56px;font-size:20px;background:linear-gradient(135deg,var(--gold),var(--orange));}
+.p2 .podium-av{width:44px;height:44px;font-size:16px;background:linear-gradient(135deg,#c0c0c0,#888);}
+.p3 .podium-av{width:40px;height:40px;font-size:14px;background:linear-gradient(135deg,#cd7f32,#8b4513);}
+.podium-name{font-size:11px;font-weight:700;text-align:center;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.podium-pts{font-size:10px;color:var(--gold);}
+.podium-block{border-radius:7px 7px 0 0;width:56px;}
+.p1 .podium-block{height:52px;background:rgba(247,201,72,0.12);}
+.p2 .podium-block{height:36px;background:rgba(192,192,192,0.09);}
+.p3 .podium-block{height:24px;background:rgba(205,127,50,0.09);}
+
+/* PROFILE */
+.profile-hero{background:linear-gradient(135deg,rgba(247,201,72,0.09),rgba(255,140,66,0.04));border:1px solid rgba(247,201,72,0.14);border-radius:17px;padding:20px;text-align:center;margin-bottom:13px;}
+.profile-avatar{width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:900;color:#0a0e1a;margin:0 auto 9px;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+.stat-card .stat-val{font-size:21px;font-weight:900;color:var(--gold);}
+.stat-card .stat-label{font-size:11px;color:var(--muted);margin-top:2px;}
+.ranks-list{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.ranks-list-title{padding:10px 13px;font-weight:800;font-size:13px;border-bottom:1px solid var(--border);}
+.rank-row{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--border);}
+.rank-row:last-child{border-bottom:none;}
+.rank-row.current{background:rgba(247,201,72,0.05);}
+.rank-row .r-name{flex:1;font-weight:700;font-size:12px;}
+.rank-row.current .r-name{color:var(--gold);}
+.rank-row .r-req{font-size:10px;color:var(--muted);}
+
+/* TOAST */
+#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(14px);background:rgba(20,28,48,0.97);border:1px solid var(--border);border-radius:12px;padding:9px 15px;font-size:13px;font-weight:600;opacity:0;transition:.22s;z-index:999;white-space:nowrap;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.pts{border-color:rgba(107,255,184,0.35);color:var(--green);}
+#toast.warn{border-color:rgba(255,200,50,0.3);color:var(--gold);}
+
+/* RANK UP */
+#rankUp{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:300;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);}
+#rankUp.show{display:flex;}
+.rank-up-card{background:linear-gradient(135deg,#1a2540,#0f1a30);border:2px solid var(--gold);border-radius:22px;padding:32px 24px;text-align:center;animation:popIn .4s ease;max-width:300px;width:90%;}
+@keyframes popIn{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+/* CONFETTI */
+.confetti-dot{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:1000;animation:cflyout .7s ease-out forwards;}
+@keyframes cflyout{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--tx),var(--ty)) scale(0.2);opacity:0;}}
+
+/* ADMIN */
+.admin-top{background:linear-gradient(135deg,#1a0a2e,#2a0a1a);border-bottom:1px solid rgba(255,107,107,0.2);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.admin-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ff6b6b,#ff8c42);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0;}
+.admin-content{padding:14px;padding-bottom:20px;max-width:700px;margin:0 auto;}
+.admin-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.admin-stat{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:13px;text-align:center;}
+.admin-stat .as-val{font-size:24px;font-weight:900;color:var(--gold);}
+.admin-stat .as-lbl{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600;}
+.student-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:14px;margin-bottom:8px;overflow:hidden;cursor:pointer;transition:.15s;}
+.student-card:hover{border-color:rgba(247,201,72,0.2);}
+.student-card.top1{border-color:rgba(247,201,72,0.3);background:rgba(247,201,72,0.05);}
+.student-card.top2{border-color:rgba(192,192,192,0.25);}
+.student-card.top3{border-color:rgba(205,127,50,0.25);}
+.sc-main{display:flex;align-items:center;gap:11px;padding:12px 14px;}
+.sc-pos{width:26px;font-size:16px;font-weight:900;color:var(--muted);text-align:center;flex-shrink:0;}
+.sc-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#0a0e1a;flex-shrink:0;}
+.sc-info{flex:1;min-width:0;}
+.sc-name{font-weight:800;font-size:14px;}
+.sc-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.sc-right{text-align:left;flex-shrink:0;}
+.sc-pts{font-size:18px;font-weight:900;color:var(--gold);}
+.sc-tasks{font-size:11px;color:var(--muted);}
+.sc-detail{display:none;padding:0 14px 12px;border-top:1px solid rgba(255,255,255,0.06);}
+.sc-detail.open{display:block;}
+.sc-detail-title{font-size:11px;font-weight:800;color:var(--muted);margin:8px 0 6px;text-transform:uppercase;letter-spacing:.5px;}
+.sc-task-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.sc-task-row:last-child{border-bottom:none;}
+.sc-task-check{font-size:13px;width:18px;text-align:center;}
+.sc-task-name{flex:1;font-size:12px;color:var(--muted);}
+.sc-task-name.done{color:var(--green);}
+.sc-task-pts{font-size:11px;color:var(--gold);}
+.admin-section-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 8px;}
+.admin-notice{background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:rgba(255,150,150,0.9);margin-bottom:14px;text-align:center;}
+
+/* ADMIN TABS */
+.admin-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.admin-tab{flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;}
+.admin-tab.active{background:rgba(255,107,107,0.15);border-color:rgba(255,107,107,0.4);color:#ff8080;}
+
+/* GRAPHS */
+.graph-section{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:14px;}
+.graph-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
+.cat-bar-row{margin-bottom:11px;}
+.cat-bar-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.cat-bar-name{font-size:13px;font-weight:700;}
+.cat-bar-pct{font-size:12px;font-weight:800;}
+.cat-bar-track{background:rgba(255,255,255,0.07);border-radius:100px;height:10px;overflow:hidden;}
+.cat-bar-fill{height:100%;border-radius:100px;transition:width .8s ease;}
+.task-insight-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.task-insight-row:last-child{border-bottom:none;}
+.task-insight-name{flex:1;font-size:12px;}
+.task-insight-bar{width:80px;height:7px;border-radius:100px;background:rgba(255,255,255,0.08);overflow:hidden;flex-shrink:0;}
+.task-insight-fill{height:100%;border-radius:100px;}
+.task-insight-num{font-size:11px;font-weight:700;width:32px;text-align:left;}
+/* HEATMAP */
+.heatmap-wrap{overflow-x:auto;}
+.heatmap{border-collapse:collapse;width:100%;min-width:300px;}
+.heatmap th{font-size:10px;color:var(--muted);font-weight:700;padding:5px 6px;text-align:center;white-space:nowrap;}
+.heatmap th:first-child{text-align:right;}
+.heatmap td{padding:5px 6px;text-align:center;font-size:11px;font-weight:700;}
+.heatmap td:first-child{text-align:right;font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;padding-left:0;}
+.hm-cell{width:36px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+/* RADAR */
+.radar-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.radar-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px;text-align:center;}
+.radar-name{font-size:12px;font-weight:800;margin-bottom:8px;color:var(--text);}
+/* two-col insights */
+.insight-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.insight-col-title{font-size:11px;font-weight:800;margin-bottom:8px;text-align:center;padding:5px;border-radius:8px;}
+.insight-col-title.strong{background:rgba(107,255,184,0.1);color:var(--green);}
+.insight-col-title.weak{background:rgba(255,107,107,0.1);color:#ff8080;}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="authScreen" class="screen active">
+  <div class="auth-box">
+    <div class="app-logo">🏆</div>
+    <div class="app-title">אלופי הקיץ</div>
+    <div class="app-sub">הפוך את החופש לחוויה מנצחת!</div>
+    <div class="tabs">
+      <button class="tab" id="tabLogin" onclick="switchAuthTab('login')">כניסה</button>
+      <button class="tab active" id="tabReg" onclick="switchAuthTab('register')">הרשמה חדשה</button>
+    </div>
+    <div id="loginForm" style="display:none">
+      <div class="field"><label>שם משתמש</label><input id="loginUser" type="text" placeholder="שם משתמש"></div>
+      <div class="field"><label>סיסמה</label><input id="loginPass" type="password" placeholder="סיסמה"></div>
+      <button class="btn btn-gold mt8" onclick="doLogin()">כניסה</button>
+      <div class="err" id="loginErr"></div>
+    </div>
+    <div id="registerForm">
+      <div class="field"><label>שם מלא</label><input id="regName" type="text" placeholder="שם פרטי ומשפחה"></div>
+      <div class="field"><label>שם משתמש</label><input id="regUser" type="text" placeholder="ייחודי, ללא רווחים"></div>
+      <div class="field"><label>כיתה</label>
+        <select id="regClass"><option value="">בחר כיתה</option><option>ז'1</option><option>ז'2</option><option>ז'3</option><option>ז'4</option><option>ז'5</option><option>ז'6</option><option>אחר</option></select>
+      </div>
+      <div class="field"><label>סיסמה</label><input id="regPass" type="password" placeholder="לפחות 4 תווים"></div>
+      <button class="btn btn-gold mt8" onclick="doRegister()">הצטרפות לאתגר! 🏆</button>
+      <div class="err" id="regErr"></div>
+    </div>
+    <div id="adminEntry" style="margin-top:14px;background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.18);border-radius:12px;padding:13px;">
+      <div style="font-size:12px;color:rgba(255,150,150,0.8);font-weight:700;margin-bottom:8px;">🏫 כניסת מנהל / מורה</div>
+      <input id="adminPassInput" type="password" placeholder="סיסמת מנהל" style="width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid rgba(255,107,107,0.25);background:rgba(255,255,255,0.05);color:#fff;font-size:14px;outline:none;font-family:inherit;direction:ltr;text-align:left;">
+      <button onclick="doAdminLogin()" style="width:100%;margin-top:8px;padding:10px;border-radius:9px;border:none;background:linear-gradient(90deg,#ff6b6b,#ff8c42);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">כניסה 🔐</button>
+      <div class="err" id="adminErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div id="adminScreen" class="screen">
+  <div class="admin-top">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="admin-avatar">🏫</div>
+      <div><div style="font-weight:800;font-size:14px">לוח בקרה – מנהל</div><div style="font-size:11px;color:rgba(255,150,150,0.7)" id="adminDate">טוען...</div></div>
+    </div>
+    <button class="icon-btn" onclick="doLogout()">יציאה</button>
+  </div>
+  <div class="admin-content">
+    <div class="admin-tabs">
+      <button class="admin-tab active" id="atab1" onclick="showAdminTab('students')">👥 תלמידים</button>
+      <button class="admin-tab" id="atab2" onclick="showAdminTab('graphs')">📊 גרפים</button>
+    </div>
+    <div id="adminTabStudents"></div>
+    <div id="adminTabGraphs" style="display:none"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="mainScreen" class="screen">
+  <div class="top-bar">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div class="avatar" id="topAvatar">א</div>
+      <div><div class="user-name" id="topName">שלום!</div><div class="user-pts" id="topPts">0 נקודות</div></div>
+    </div>
+    <button class="icon-btn" onclick="doLogout()">יציאה</button>
+  </div>
+  <div class="hdate-bar" id="hdateBar">טוען...</div>
+
+  <div id="pageHome" class="content">
+    <div id="timeBanner"></div>
+    <div class="progress-card">
+      <div style="font-size:12px;color:var(--muted)">התקדמות היום</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="dayProgressBar" style="width:0%"></div></div>
+      <div class="progress-stats">
+        <div><span class="pts-big" id="dayPts">0</span> <span style="color:var(--muted);font-size:11px">נקודות היום</span></div>
+        <div style="color:var(--muted);font-size:11px" id="dayDone">0/0</div>
+      </div>
+    </div>
+    <div class="rank-badge" id="rankBadge">
+      <span id="rankIcon">⭐</span>
+      <div><div style="font-weight:800;color:var(--gold);font-size:13px" id="rankName">מתחיל</div><div style="font-size:11px;color:var(--muted)" id="rankNext"></div></div>
+    </div>
+    <div class="bonus-card" id="bonusCard" onclick="doBonus()">
+      <div style="font-size:24px" id="bonusIcon">⭐</div>
+      <div style="flex:1"><div style="font-weight:800;font-size:13px;color:var(--green)">משימת בונוס יומית!</div><div style="font-size:12px;color:var(--muted)" id="bonusDesc"></div></div>
+      <div class="bonus-pts" id="bonusPts">+15</div>
+    </div>
+    <div id="taskList"></div>
+  </div>
+
+  <div id="pageLeaderboard" class="content" style="display:none">
+    <div style="text-align:center;padding:14px 0 10px"><h2 style="font-size:18px;font-weight:900">🏅 טבלת הדירוג</h2><p style="color:var(--muted);font-size:12px;margin-top:3px">מי יהיה אלוף הקיץ?</p></div>
+    <div class="podium" id="podium"></div>
+    <div id="lbList"></div>
+  </div>
+
+  <div id="pageProfile" class="content" style="display:none">
+    <div class="profile-hero">
+      <div class="profile-avatar" id="profAvatar">א</div>
+      <div style="font-size:18px;font-weight:900" id="profName">שם</div>
+      <div style="color:var(--gold);font-size:12px;margin-top:5px"><span id="profRankIcon">⭐</span> <span id="profRankName">מתחיל</span></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-label">סה"כ נקודות</div></div>
+      <div class="stat-card"><div class="stat-val" id="statDays">0</div><div class="stat-label">ימי פעילות</div></div>
+      <div class="stat-card"><div class="stat-val" id="statTasks">0</div><div class="stat-label">משימות</div></div>
+      <div class="stat-card"><div class="stat-val" id="statStreak">0</div><div class="stat-label">ימים ברצף 🔥</div></div>
+    </div>
+    <div class="ranks-list"><div class="ranks-list-title">🎯 מסלול הדרגות</div><div id="ranksList"></div></div>
+    <div style="margin-top:12px"><button class="btn btn-outline" onclick="doLogout()">התנתקות</button></div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-item active" id="navHome" onclick="showPage('home')"><span class="nav-icon">🏠</span><span class="nav-label">בית</span></button>
+    <button class="nav-item" id="navLb" onclick="showPage('leaderboard')"><span class="nav-icon">🏅</span><span class="nav-label">דירוג</span></button>
+    <button class="nav-item" id="navProfile" onclick="showPage('profile')"><span class="nav-icon">👤</span><span class="nav-label">פרופיל</span></button>
+  </div>
+</div>
+
+<!-- LEARN MODAL -->
+<div class="modal-overlay" id="learnModal" onclick="closeModalBg(event,'learnModal')">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-badge" id="mBadge">📖</span>
+      <span class="modal-badge-text" id="mBadgeText">לימוד</span>
+      <button class="modal-close" onclick="closeModal('learnModal')">✕</button>
+    </div>
+    <div class="modal-hdate" id="mHdate"></div>
+    <div class="modal-title" id="mTitle"></div>
+    <div id="mBody"></div>
+    <button class="btn btn-gold" id="mConfirm" onclick="confirmLearn()" style="margin-top:12px;display:none">✓ סיימתי!</button>
+  </div>
+</div>
+
+<!-- SPORT MODAL -->
+<div class="modal-overlay" id="sportModal" onclick="closeModalBg(event,'sportModal')">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-badge" id="smIcon">💪</span>
+      <span class="modal-badge-text" id="smTitle">ספורט</span>
+      <button class="modal-close" onclick="closeModal('sportModal')">✕</button>
+    </div>
+    <div class="sport-counter" id="smCount">0</div>
+    <div class="sport-target" id="smTarget">מתוך 10</div>
+    <div class="progress-bar-wrap" style="margin:0 0 9px"><div class="progress-bar-fill" id="smBar" style="width:0%"></div></div>
+    <button class="sport-tap-btn" onclick="tapSport()">הקש! 💥</button>
+    <button class="btn btn-gold" id="smDone" onclick="confirmSport()" style="opacity:.35;pointer-events:none">✓ סיימתי!</button>
+  </div>
+</div>
+
+<!-- RANK UP -->
+<div id="rankUp">
+  <div class="rank-up-card">
+    <div style="font-size:62px;margin-bottom:8px" id="ruIcon">🏆</div>
+    <h2 style="font-size:19px;font-weight:900;color:var(--gold);margin-bottom:6px">קפצת דרגה!</h2>
+    <p style="color:var(--muted);margin-bottom:16px" id="ruText">כל הכבוד!</p>
+    <button class="btn btn-gold" onclick="document.getElementById('rankUp').classList.remove('show')">המשך 💪</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const RANKS=[
+  {name:'מתחיל',icon:'🌱',min:0},{name:'לוחם',icon:'⚔️',min:100},
+  {name:'גיבור',icon:'🦸',min:250},{name:'אלוף',icon:'🏆',min:500},
+  {name:'אלוף-על',icon:'👑',min:800},{name:'אלוף הקיץ',icon:'🌟',min:1200},
+];
+
+const MISH=[
+  {r:'אבות א׳:א׳',s:'שרשרת המסורה',t:'מֹשֶׁה קִבֵּל תּוֹרָה מִסִּינַי, וּמְסָרָהּ לִיהוֹשֻׁעַ, וִיהוֹשֻׁעַ לִזְקֵנִים, וּזְקֵנִים לִנְבִיאִים, וּנְבִיאִים מְסָרוּהָ לְאַנְשֵׁי כְנֶסֶת הַגְּדוֹלָה. הֵם אָמְרוּ שְׁלֹשָׁה דְבָרִים: הֱווּ מְתוּנִים בַּדִּין, וְהַעֲמִידוּ תַלְמִידִים הַרְבֵּה, וַעֲשׂוּ סְיָג לַתּוֹרָה.'},
+  {r:'אבות א׳:ב׳',s:'על שלושה דברים העולם עומד',t:'שִׁמְעוֹן הַצַּדִּיק הָיָה אוֹמֵר: עַל שְׁלֹשָׁה דְבָרִים הָעוֹלָם עוֹמֵד — עַל הַתּוֹרָה, וְעַל הָעֲבוֹדָה, וְעַל גְּמִילוּת חֲסָדִים.'},
+  {r:'אבות א׳:ג׳',s:'עבודה לשמה',t:'אַנְטִיגְנוֹס אוֹמֵר: אַל תִּהְיוּ כַעֲבָדִים הַמְשַׁמְּשִׁין עַל מְנָת לְקַבֵּל פְּרָס, אֶלָּא הֱווּ כַּעֲבָדִים הַמְשַׁמְּשִׁין שֶׁלֹּא עַל מְנָת לְקַבֵּל פְּרָס, וִיהִי מוֹרָא שָׁמַיִם עֲלֵיכֶם.'},
+  {r:'אבות א׳:ו׳',s:'עשה לך רב וקנה לך חבר',t:'יְהוֹשֻׁעַ בֶּן פְּרַחְיָה אוֹמֵר: עֲשֵׂה לְךָ רַב, וּקְנֵה לְךָ חָבֵר, וֶהֱוֵי דָן אֶת כָּל הָאָדָם לְכַף זְכוּת.'},
+  {r:'אבות א׳:ז׳',s:'הרחק מחבר רע',t:'נִתַּאי הָאַרְבֵּלִי אוֹמֵר: הַרְחֵק מִשָּׁכֵן רָע, וְאַל תִּתְחַבֵּר לָרָשָׁע, וְאַל תִּתְיָאֵשׁ מִן הַפֻּרְעָנוּת.'},
+  {r:'אבות א׳:י״ב',s:'הוי מתלמידיו של אהרן',t:'הִלֵּל אוֹמֵר: הֱוֵי מִתַּלְמִידָיו שֶׁל אַהֲרֹן, אוֹהֵב שָׁלוֹם וְרוֹדֵף שָׁלוֹם, אוֹהֵב אֶת הַבְּרִיּוֹת וּמְקָרְבָן לַתּוֹרָה.'},
+  {r:'אבות א׳:י״ד',s:'אם אין אני לי מי לי',t:'הוּא הָיָה אוֹמֵר: אִם אֵין אֲנִי לִי, מִי לִי? וּכְשֶׁאֲנִי לְעַצְמִי, מָה אֲנִי? וְאִם לֹא עַכְשָׁיו, אֵימָתַי?'},
+  {r:'אבות א׳:ט״ו',s:'עשה תורתך קבע',t:'שַׁמַּאי אוֹמֵר: עֲשֵׂה תוֹרָתְךָ קֶבַע, אֱמֹר מְעַט וַעֲשֵׂה הַרְבֵּה, וֶהֱוֵי מְקַבֵּל אֶת כָּל הָאָדָם בְּסֵבֶר פָּנִים יָפוֹת.'},
+  {r:'אבות ב׳:א׳',s:'הוי זהיר במצווה קלה',t:'רַבִּי אוֹמֵר: אֵיזוֹהִי דֶּרֶךְ יְשָׁרָה שֶׁיָּבֹר לוֹ הָאָדָם? כֹּל שֶׁהִיא תִּפְאֶרֶת לְעוֹשֶׂיהָ וְתִפְאֶרֶת לוֹ מִן הָאָדָם. וֶהֱוֵי זָהִיר בְּמִצְוָה קַלָּה כְּבַחֲמוּרָה.'},
+  {r:'אבות ב׳:ה׳',s:'אל תפרוש מן הציבור',t:'הִלֵּל אוֹמֵר: אַל תִּפְרֹשׁ מִן הַצִּבּוּר, וְאַל תַּאֲמִין בְּעַצְמְךָ עַד יוֹם מוֹתְךָ, וְאַל תָּדִין אֶת חֲבֵרְךָ עַד שֶׁתַּגִּיעַ לִמְקוֹמוֹ.'},
+  {r:'אבות ב׳:ז׳',s:'מרבה תורה מרבה חיים',t:'הוּא הָיָה אוֹמֵר: מַרְבֶּה נְכָסִים, מַרְבֶּה דְאָגָה. מַרְבֶּה תוֹרָה, מַרְבֶּה חַיִּים. מַרְבֶּה צְדָקָה, מַרְבֶּה שָׁלוֹם.'},
+  {r:'אבות ג׳:א׳',s:'דע מאין באת ולאן אתה הולך',t:'עֲקַבְיָא בֶּן מַהֲלַלְאֵל אוֹמֵר: הִסְתַּכֵּל בִּשְׁלֹשָׁה דְבָרִים וְאֵין אַתָּה בָא לִידֵי עֲבֵירָה: דַּע מֵאַיִן בָּאתָ, וּלְאָן אַתָּה הוֹלֵךְ, וְלִפְנֵי מִי אַתָּה עָתִיד לִתֵּן דִּין וְחֶשְׁבּוֹן.'},
+  {r:'אבות ג׳:י״ד',s:'חביב אדם שנברא בצלם',t:'הוּא הָיָה אוֹמֵר: חָבִיב אָדָם שֶׁנִּבְרָא בְצֶלֶם. חִבָּה יְתֵרָה נוֹדַעַת לוֹ שֶׁנִּבְרָא בְצֶלֶם. חֲבִיבִין יִשְׂרָאֵל שֶׁנִּקְרְאוּ בָנִים לַמָּקוֹם.'},
+  {r:'אבות ד׳:א׳',s:'חכם גיבור עשיר מכובד',t:'בֶּן זוֹמָא אוֹמֵר: אֵיזֶהוּ חָכָם? הַלּוֹמֵד מִכָּל אָדָם. אֵיזֶהוּ גִּבּוֹר? הַכּוֹבֵשׁ אֶת יִצְרוֹ. אֵיזֶהוּ עָשִׁיר? הַשָּׂמֵחַ בְּחֶלְקוֹ. אֵיזֶהוּ מְכֻבָּד? הַמְכַבֵּד אֶת הַבְּרִיּוֹת.'},
+  {r:'אבות ד׳:ב׳',s:'מצווה גוררת מצווה',t:'בֶּן עַזַּאי אוֹמֵר: הֱוֵי רָץ לְמִצְוָה קַלָּה כְּבַחֲמוּרָה, וּבוֹרֵחַ מִן הָעֲבֵירָה. שֶׁמִּצְוָה גּוֹרֶרֶת מִצְוָה, וַעֲבֵירָה גּוֹרֶרֶת עֲבֵירָה.'},
+  {r:'אבות ד׳:ג׳',s:'אל תבוז לאף אדם',t:'הוּא הָיָה אוֹמֵר: אַל תְּהִי בָז לְכָל אָדָם, וְאַל תְּהִי מַפְלִיג לְכָל דָּבָר. שֶׁאֵין לְךָ אָדָם שֶׁאֵין לוֹ שָׁעָה, וְאֵין לְךָ דָּבָר שֶׁאֵין לוֹ מָקוֹם.'},
+  {r:'אבות ד׳:י״ג',s:'כתר שם טוב',t:'רַבִּי שִׁמְעוֹן אוֹמֵר: שְׁלֹשָׁה כְתָרִים הֵם — כֶּתֶר תּוֹרָה, כֶּתֶר כְּהֻנָּה, כֶּתֶר מַלְכוּת. וְכֶתֶר שֵׁם טוֹב עוֹלֶה עַל גַּבֵּיהֶן.'},
+  {r:'אבות ד׳:י״ז',s:'יפה שעה אחת בתשובה',t:'רַבִּי שִׁמְעוֹן אוֹמֵר: יָפָה שָׁעָה אַחַת בִּתְשׁוּבָה וּמַעֲשִׂים טוֹבִים בָּעוֹלָם הַזֶּה מִכָּל חַיֵּי הָעוֹלָם הַבָּא.'},
+  {r:'אבות ה׳:כ׳',s:'הוי עז כנמר',t:'יְהוּדָה בֶּן תֵּימָא אוֹמֵר: הֱוֵי עַז כַּנָּמֵר, וְקַל כַּנֶּשֶׁר, וְרָץ כַּצְּבִי, וְגִבּוֹר כָּאֲרִי, לַעֲשׂוֹת רְצוֹן אָבִיךָ שֶׁבַּשָּׁמַיִם.'},
+  {r:'אבות ה׳:כ״א',s:'שלבי הלימוד לפי גיל',t:'הוּא הָיָה אוֹמֵר: בֶּן חָמֵשׁ שָׁנִים לַמִּקְרָא, בֶּן עֶשֶׂר לַמִּשְׁנָה, בֶּן שְׁלֹשׁ עֶשְׂרֵה לַמִּצְווֹת, בֶּן חֲמֵשׁ עֶשְׂרֵה לַתַּלְמוּד, בֶּן שְׁמוֹנֶה עֶשְׂרֵה לַחֻפָּה.'},
+  {r:'אבות ו׳:א׳',s:'העוסק בתורה לשמה',t:'רַבִּי מֵאִיר אוֹמֵר: כָּל הָעוֹסֵק בַּתּוֹרָה לִשְׁמָהּ, זוֹכֶה לִדְבָרִים הַרְבֵּה. וְלֹא עוֹד, אֶלָּא שֶׁכָּל הָעוֹלָם כֻּלּוֹ כְּדַאי הוּא לוֹ.'},
+  {r:'אבות ו׳:ד׳',s:'דרכה של תורה',t:'כָּךְ הִיא דַּרְכָּהּ שֶׁל תּוֹרָה: פַּת בְּמֶלַח תֹּאכַל, וּמַיִם בִּמְשׂוּרָה תִּשְׁתֶּה, וְעַל הָאָרֶץ תִּישַׁן, וּבַתּוֹרָה אַתָּה עָמֵל. אִם עוֹשֶׂה כֵן — "אַשְׁרֶיךָ וְטוֹב לָךְ".'},
+  {r:'אבות ו׳:ה׳',s:'אל תבקש גדולה לעצמך',t:'אַל תְּבַקֵּשׁ גְּדֻלָּה לְעַצְמְךָ, וְאַל תַּחְמֹד כָּבוֹד. יוֹתֵר מִלִּמּוּדְךָ עֲשֵׂה. וְאַל תִּתְאַוֶּה לְשֻׁלְחָנָם שֶׁל מְלָכִים.'},
+];
+
+// Mishna sets: 5 mishnayot + comprehension question
+const MISHNA_SETS=[
+  {title:'פרקי אבות א׳ – חלק א׳',idx:[0,1,2,3,4],
+   q:'על מה אמר שמעון הצדיק שהעולם עומד?',
+   a:['תורה, עבודה, גמילות חסדים','שבת, תפילה, תשובה','אמת, שלום, דין','לחם, מים ושמש'],c:0,timer:30},
+  {title:'פרקי אבות א׳ – חלק ב׳',idx:[5,6,7,8,9],
+   q:'כיצד מסתיים הפסוק: "אם אין אני לי, מי לי. וכשאני לעצמי, מה אני..."?',
+   a:['ואם לא עכשיו, אימתי','ואם לא עכשיו, מחר','ואם לא אני, מי','ואם לא כן, למה'],c:0,timer:30},
+  {title:'פרקי אבות ב׳–ג׳',idx:[10,11,12,13,14],
+   q:'מה אמר בן זומא: "איזהו חכם?"',
+   a:['הלומד מכל אדם','הלומד מרבו בלבד','היודע כל התורה','המקיים את כל המצוות'],c:0,timer:30},
+  {title:'פרקי אבות ד׳ – חלק א׳',idx:[15,16,17,18,19],
+   q:'מה גוררת מצווה לפי בן עזאי?',
+   a:['מצווה גוררת מצווה','מצווה גוררת ברכה','מצווה גוררת פרס','מצווה גוררת עושר'],c:0,timer:30},
+  {title:'פרקי אבות ה׳–ו׳',idx:[20,21,22,0,1],
+   q:'לפי פרקי אבות, בן כמה שנים ללמידת משנה?',
+   a:['בן עשר','בן חמש','בן שלוש עשרה','בן שמונה'],c:0,timer:30},
+];
+
+// Halachot WITH comprehension questions
+const HALACHOT=[
+  {t:'מודה אני',s:'נאמרת לפני נטילת ידיים',
+   tx:'בקומו ממיטתו, אפילו לפני נטילת ידיים, אומר:\n\n"מוֹדֶה אֲנִי לְפָנֶיךָ מֶלֶךְ חַי וְקַיָּם שֶׁהֶחֱזַרְתָּ בִּי נִשְׁמָתִי בְּחֶמְלָה — רַבָּה אֱמוּנָתֶךָ!"\n\nאין צריך ליטול ידיים לפני כן, כיוון שאין בה שם ה׳. זוהי הברכה הראשונה של היום!',
+   q:'מתי אומרים "מודה אני"?',
+   a:['מיד בקומו, לפני נטילת ידיים','רק לאחר נטילת ידיים','בסוף תפילת שחרית','לפני השינה'],c:0,timer:30},
+
+  {t:'נטילת ידיים שחרית',s:'שלוש פעמים לסירוגין',
+   tx:'בקומו מן השינה חייב ליטול ידיו שלוש פעמים לסירוגין — ימין, שמאל, ימין, שמאל, ימין, שמאל.\n\nהסיבה: רוח רעה שורה על הידיים בלילה ומסתלקת על ידי הנטילה. יש לשפוך על כל כף היד עד פרק האמה.',
+   q:'כמה פעמים נוטלים ידיים שחרית, ובאיזה סדר?',
+   a:['שלוש פעמים לסירוגין – ימין שמאל ימין...','פעם אחת על כל יד','שתי פעמים על כל יד','ארבע פעמים לסירוגין'],c:0,timer:30},
+
+  {t:'ציצית',s:'מזכירה את כל המצוות',
+   tx:'מצוות ציצית — חיובה ביום. מצווה מן המובחר ללבוש ציצית כל היום.\n\nבשעת הלבישה מברך "לְהִתְעַטֵּף בַּצִּיצִית". יש נוהגים לנשק את הציצית.\n\nהציצית מזכירה לנו את כל המצוות — "וּרְאִיתֶם אֹתוֹ, וּזְכַרְתֶּם אֶת כָּל מִצְווֹת ה׳".',
+   q:'מה מזכירה לנו הציצית?',
+   a:['את כל המצוות','את יציאת מצרים בלבד','את השבת','את בית המקדש'],c:0,timer:30},
+
+  {t:'קריאת שמע',s:'עד סוף 3 שעות מהנץ',
+   tx:'מצווה מן התורה לקרוא קריאת שמע פעמיים ביום — שחרית וערבית.\n\nזמן ק"ש שחרית: עד סוף שלוש שעות זמניות מהנץ החמה.\n\nיש לקרוא "שְׁמַע יִשְׂרָאֵל" בכוונה מיוחדת ולהאריך ב-דלת של "אֶחָד" — להמליך את ה׳ בשמים ובארץ ובארבע רוחות.',
+   q:'על איזו אות יש להאריך בפסוק הראשון של קריאת שמע?',
+   a:['דלת של "אחד"','עין של "שמע"','אלף של "ישראל"','מם של "אחד"'],c:0,timer:30},
+
+  {t:'תפילת שחרית',s:'מהנץ עד סוף 4 שעות',
+   tx:'זמן תפילת שחרית: מהנץ החמה ועד סוף ד׳ שעות זמניות. בדיעבד — עד חצות.\n\nסדר: ברכות השחר → פסוקי דזמרה → ק"ש וברכותיה → שמונה עשרה → תחנון.\n\nלפני שמונה עשרה אין לשוח שיחת חולין.',
+   q:'עד מתי ניתן להתפלל שחרית בדיעבד?',
+   a:['עד חצות היום','עד סוף שלוש שעות','עד הנץ','עד הלילה'],c:0,timer:30},
+
+  {t:'תפילת מנחה',s:'מחצי שעה אחר חצות עד הלילה',
+   tx:'תפילת מנחה — חשובה מאוד! תפילת אליהו הנביא נענתה בשעת מנחה!\n\nזמן מנחה גדולה: מחצי שעה אחר חצות. מנחה קטנה (עדיף): שתי שעות וחצי לפני שקיעה.\n\nלא יאכל סעודה גדולה חצי שעה לפני מנחה קטנה.',
+   q:'תפילת מי נענתה בשעת מנחה?',
+   a:['אליהו הנביא','משה רבנו','אברהם אבינו','דוד המלך'],c:0,timer:30},
+
+  {t:'תפילת ערבית',s:'מצאת הכוכבים',
+   tx:'זמן ערבית מצאת הכוכבים. מנהג ישראל לקוראה כחובה.\n\nלאחר ערבית בלילות חול אומרים "וִיהִי נֹעַם" ו"וְאַתָּה קָדוֹשׁ".\n\nחשוב לקרוא ק"ש לפני השינה — אפילו אם כבר התפלל ערבית.',
+   q:'מה חשוב לקרוא לפני השינה אפילו אחרי תפילת ערבית?',
+   a:['קריאת שמע','שמונה עשרה פעם נוספת','ויהי נועם','ברכות השחר'],c:0,timer:30},
+
+  {t:'כיבוד אב ואם',s:'שקולה כנגד כבוד המקום',
+   tx:'מצוות כיבוד אב ואם שקולה כנגד כבוד המקום!\n\nכיבוד: לספק מזון, שתייה, ביגוד. מורא: לא לעמוד במקומם, לא לסתור דבריהם.\n\nגם אם ההורים מכעיסים — אסור לבייש אותם. "כַּבֵּד אֶת אָבִיךָ וְאֶת אִמֶּךָ".',
+   q:'כנגד מה שקולה מצוות כיבוד אב ואם?',
+   a:['כנגד כבוד המקום','כנגד שמירת שבת','כנגד מצוות הצדקה','כנגד לימוד תורה'],c:0,timer:30},
+
+  {t:'לשון הרע',s:'הורג שלושה',
+   tx:'איסור לשון הרע: אסור לדבר רעות על אדם אחר אפילו אם הן אמת!\n\nחז"ל אמרו: לשון הרע הורג שלושה — המספר, השומע, ונאמר עליו.\n\nאם ראית משהו רע — שתוק. "מדבר שקר תרחק!"',
+   q:'לפי חז"ל, כמה אנשים "הורג" לשון הרע?',
+   a:['שלושה – המספר, השומע, ונאמר עליו','אחד – הנאמר עליו','שניים – המספר והשומע','את כל מי שמאמין לו'],c:0,timer:30},
+
+  {t:'גמילות חסדים',s:'גדולה ממצות הצדקה',
+   tx:'מצוות גמילות חסדים גדולה ממצות הצדקה: הצדקה לעניים בלבד, גמ"ח לכל אדם. הצדקה בממון, גמ"ח גם בגוף ובזמן.\n\n"וְאָהַבְתָּ לְרֵעֲךָ כָּמוֹךָ" — בסיס כל התורה.\n\nביקור חולים, הכנסת אורחים, ניחום אבלים — גמ"ח בגוף.',
+   q:'מה ההבדל בין צדקה לגמילות חסדים?',
+   a:['צדקה רק לעניים בממון, גמ"ח לכולם גם בגוף','אין הבדל — שניהם אותו דבר','צדקה יותר חשובה מגמ"ח','גמ"ח רק בממון'],c:0,timer:30},
+
+  {t:'צדקה',s:'מינימום 10% מהכנסה',
+   tx:'מצוות צדקה: לפחות עשרה אחוזים מהכנסותיך ("מעשר כספים").\n\n"כִּי פָתֹחַ תִּפְתַּח אֶת יָדְךָ לוֹ" — הכתוב כפל לחזק את הלב.\n\nנתינת צדקה בסתר — מעלה גדולה.',
+   q:'מה נקרא המינימום שנדרשים לתת לצדקה?',
+   a:['מעשר כספים – עשרה אחוזים','חמישה אחוזים','עשרים אחוזים','אין שיעור קבוע'],c:0,timer:30},
+
+  {t:'שבת קודש',s:'ל"ט מלאכות אסורות',
+   tx:'שבת היא מן הדאורייתא — "זָכוֹר" ו"שָׁמוֹר".\n\nל"ט מלאכות אסורות בשבת. מצוות עונג שבת: שלוש סעודות, בגדי שבת, מנוחה ושמחה.\n\nלימוד תורה בשבת — מצווה גדולה!',
+   q:'כמה מלאכות אסורות בשבת?',
+   a:['ל"ט (שלושים ותשע)','עשרים','ארבעים','עשר'],c:0,timer:30},
+];
+
+// Videos WITH comprehension questions
+const VIDEOS=[
+  {t:'הידברות – שיעור יומי קצר',d:'5-10 דקות של חיזוק ועידוד',ch:'הידברות',
+   url:'https://www.youtube.com/@hidabroot/videos',
+   q2:'מה הוא ערוץ הידברות?',
+   a:['ערוץ תורה וחיזוק יהדות','ערוץ חדשות','ערוץ מוזיקה','ערוץ ספורט'],c:0,timer:30},
+  {t:'הרב זמיר כהן – מסר יומי',d:'מסר קצר ומחזק לחיי היום-יום',ch:'הידברות',
+   url:'https://www.youtube.com/watch?v=9bZkp7q19f0',
+   q2:'מה תחום ההתמחות של הרב זמיר כהן?',
+   a:['קירוב לבבות ויהדות מעשית','הלכות שבת בלבד','לימוד גמרא','פוליטיקה'],c:0,timer:30},
+  {t:'הרב יגאל כהן – חיזוק לנוער',d:'שיעור מעצים לבני נוער',ch:'הידברות',
+   url:'https://www.youtube.com/@hidabroot/search?query=%D7%99%D7%92%D7%90%D7%9C+%D7%9B%D7%94%D7%9F+%D7%A0%D7%95%D7%A2%D7%A8',
+   q2:'לפי מה שצפית – מה המסר העיקרי?',
+   a:['להאמין בעצמך ובה׳','ללמוד רק גמרא','לא לשמוע להורים','להיות כמו כולם'],c:0,timer:30},
+  {t:'פרקי אבות – שיעור קצר',d:'פרקי אבות עם ביאור',ch:'שיעורי תורה',
+   url:'https://www.youtube.com/results?search_query=%D7%A4%D7%A8%D7%A7%D7%99+%D7%90%D7%91%D7%95%D7%AA+%D7%A9%D7%99%D7%A2%D7%95%D7%A8+%D7%A7%D7%A6%D7%A8',
+   q2:'פרקי אבות נלמד בעיקר באיזו תקופה?',
+   a:['בין פסח לשבועות – בקיץ','בחורף בלבד','ביום כיפור','כל השנה בשווה'],c:0,timer:30},
+  {t:'ערוץ מאיר – סיפור מוסרי',d:'סיפור מרתק עם מסר',ch:'ערוץ מאיר',
+   url:'https://www.youtube.com/@eretznehederet',
+   q2:'מה מטרתם של סיפורים עם מסר?',
+   a:['ללמד ערכים בדרך מהנה','לבדר בלבד ללא מסר','לפרסם מוצרים','ללמד אנגלית'],c:0,timer:30},
+  {t:'הרב מוצפי – שיעור יומי',d:'שיעור הלכה ואגדה',ch:'שיעורי תורה',
+   url:'https://www.youtube.com/@RavMutzafi',
+   q2:'מה כולל שיעור תורה יומי?',
+   a:['הלכה, אגדה וחיזוק','רק חדשות','ספורט ובריאות','לימוד אנגלית'],c:0,timer:30},
+  {t:'ניגון חסידי + שמחה',d:'ניגון מעצים לנפש',ch:'מוזיקה',
+   url:'https://www.youtube.com/results?search_query=%D7%A0%D7%99%D7%92%D7%95%D7%9F+%D7%97%D7%A1%D7%99%D7%93%D7%99+%D7%A9%D7%9E%D7%97%D7%94',
+   q2:'מה חשיבות הניגון בעבודת ה׳?',
+   a:['פותח את הלב לתשובה ולשמחה','רק בידור','תחליף לתפילה','אסור לשמוע מוזיקה'],c:0,timer:30},
+  {t:'הרב שמואל אליהו – שיעור',d:'שיעור תורה מרתק',ch:'שיעורי תורה',
+   url:'https://www.youtube.com/@RavShmuelEliyahu',
+   q2:'מי הוא הרב שמואל אליהו?',
+   a:['הרב הראשי של צפת','ראש הממשלה','שחקן כדורגל','מנהל בית ספר'],c:0,timer:30},
+];
+
+// ============================================================
+// PESUKIM FOR MEMORIZATION
+// ============================================================
+const PESUKIM=[
+  {ref:'שמות כ׳:ב׳',text:'אָנֹכִי יְהוָה אֱלֹהֶיךָ אֲשֶׁר הוֹצֵאתִיךָ מֵאֶרֶץ מִצְרַיִם מִבֵּית עֲבָדִים.',hint:'אנכי ה׳ אלוהיך...'},
+  {ref:'ויקרא י״ט:י״ח',text:'וְאָהַבְתָּ לְרֵעֲךָ כָּמוֹךָ אֲנִי יְהוָה.',hint:'ואהבת לרעך...'},
+  {ref:'דברים ו׳:ד׳',text:'שְׁמַע יִשְׂרָאֵל יְהוָה אֱלֹהֵינוּ יְהוָה אֶחָד.',hint:'שמע ישראל...'},
+  {ref:'משלי ג׳:ו׳',text:'בְּכָל דְּרָכֶיךָ דָעֵהוּ וְהוּא יְיַשֵּׁר אֹרְחֹתֶיךָ.',hint:'בכל דרכיך דעהו...'},
+  {ref:'תהלים כ״ז:א׳',text:'יְהוָה אוֹרִי וְיִשְׁעִי מִמִּי אִירָא יְהוָה מָעוֹז חַיַּי מִמִּי אֶפְחָד.',hint:'ה׳ אורי וישעי...'},
+  {ref:'תהלים קי״ח:כ״ד',text:'זֶה הַיּוֹם עָשָׂה יְהוָה נָגִילָה וְנִשְׂמְחָה בוֹ.',hint:'זה היום עשה ה׳...'},
+  {ref:'משלי כ״ב:ו׳',text:'חֲנֹךְ לַנַּעַר עַל פִּי דַרְכּוֹ גַּם כִּי יַזְקִין לֹא יָסוּר מִמֶּנָּה.',hint:'חנוך לנער...'},
+  {ref:'דברים ל׳:י״ד',text:'כִּי קָרוֹב אֵלֶיךָ הַדָּבָר מְאֹד בְּפִיךָ וּבִלְבָבְךָ לַעֲשֹׂתוֹ.',hint:'כי קרוב אליך...'},
+  {ref:'יהושע א׳:ח׳',text:'לֹא יָמוּשׁ סֵפֶר הַתּוֹרָה הַזֶּה מִפִּיךָ וְהָגִיתָ בּוֹ יוֹמָם וָלַיְלָה.',hint:'לא ימוש ספר התורה...'},
+  {ref:'תהלים ק״ז:א׳',text:'הוֹדוּ לַיהוָה כִּי טוֹב כִּי לְעוֹלָם חַסְדּוֹ.',hint:'הודו לה׳ כי טוב...'},
+  {ref:'משלי י״ח:כ״א',text:'מָוֶת וְחַיִּים בְּיַד לָשׁוֹן וְאֹהֲבֶיהָ יֹאכַל פִּרְיָהּ.',hint:'מוות וחיים ביד לשון...'},
+  {ref:'קהלת ד׳:ט׳',text:'טוֹבִים הַשְּׁנַיִם מִן הָאֶחָד אֲשֶׁר יֵשׁ לָהֶם שָׂכָר טוֹב בַּעֲמָלָם.',hint:'טובים השניים מן האחד...'},
+  {ref:'תהלים א׳:א׳',text:'אַשְׁרֵי הָאִישׁ אֲשֶׁר לֹא הָלַךְ בַּעֲצַת רְשָׁעִים וּבְדֶרֶךְ חַטָּאִים לֹא עָמָד.',hint:'אשרי האיש...'},
+  {ref:'דברים ל״א:ו׳',text:'חִזְקוּ וְאִמְצוּ אַל תִּירְאוּ וְאַל תַּעַרְצוּ מִפְּנֵיהֶם כִּי יְהוָה אֱלֹהֶיךָ הוּא הַהֹלֵךְ עִמָּךְ.',hint:'חזקו ואמצו...'},
+];
+
+const BONUS_POOL=[
+  {icon:'📖',desc:'קרא 10 עמודים בספר',pts:15},
+  {icon:'🎨',desc:'צייר או כתוב משהו יצירתי',pts:12},
+  {icon:'🧩',desc:'פתור חידה או משחק מחשבה',pts:10},
+  {icon:'🌳',desc:'בלה 30 דקות בחוץ ללא מסך',pts:15},
+  {icon:'📞',desc:'התקשר לחבר ושוחח 10 דקות',pts:10},
+  {icon:'🍎',desc:'אכול ארוחה בריאה ושתה 6 כוסות מים',pts:8},
+  {icon:'✍️',desc:'כתוב 3 דברים שאתה אסיר תודה עליהם',pts:10},
+  {icon:'🔧',desc:'תקן או סדר משהו בבית',pts:12},
+  {icon:'🤲',desc:'עשה מעשה חסד מפתיע למישהו',pts:20},
+  {icon:'🎵',desc:'הקשב לניגון חסידי ורקוד',pts:10},
+  {icon:'💧',desc:'שתה 8 כוסות מים היום',pts:8},
+];
+
+// ============================================================
+// STUDY CONTENT – daily exercises per subject
+// ============================================================
+const STUDY_CONTENT={
+math:[
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">47 × 8 = ?</span>',q:'מה התוצאה של 47 × 8?',a:['376','366','386','326'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">156 + 89 = ?</span>',q:'מה התוצאה של 156 + 89?',a:['245','235','255','265'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">200 − 73 = ?</span>',q:'מה התוצאה של 200 − 73?',a:['127','117','137','123'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">144 ÷ 12 = ?</span>',q:'מה התוצאה של 144 ÷ 12?',a:['12','11','13','14'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">38 × 6 = ?</span>',q:'מה התוצאה של 38 × 6?',a:['228','218','238','226'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">500 − 187 = ?</span>',q:'מה התוצאה של 500 − 187?',a:['313','323','303','333'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">24 × 9 = ?</span>',q:'מה התוצאה של 24 × 9?',a:['216','214','218','206'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">345 + 278 = ?</span>',q:'מה התוצאה של 345 + 278?',a:['623','613','633','623'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">17 × 7 = ?</span>',q:'מה התוצאה של 17 × 7?',a:['119','109','129','117'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">630 ÷ 7 = ?</span>',q:'מה התוצאה של 630 ÷ 7?',a:['90','80','70','100'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">56 × 4 = ?</span>',q:'מה התוצאה של 56 × 4?',a:['224','214','234','220'],c:0,timer:30},
+  {title:'חשבון יומי',tx:'נסה לפתור בראש:\n\n<span style="font-size:28px;font-weight:900;color:var(--gold)">15² = ?</span>',q:'מה התוצאה של 15 בריבוע?',a:['225','215','235','125'],c:0,timer:30},
+],
+english:[
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Curious"</span><br><br>משפט לדוגמה: <i>"He was curious about the stars."</i>',q:'What does "curious" mean? (מה המשמעות בעברית?)',a:['סקרן / רוצה לדעת','כועס','עצוב','שמח'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Brave"</span><br><br>משפט לדוגמה: <i>"The brave soldier saved his friend."</i>',q:'What does "brave" mean?',a:['אמיץ','חלש','עצבני','חכם'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Generous"</span><br><br>משפט לדוגמה: <i>"She was generous and shared her food."</i>',q:'What does "generous" mean?',a:['נדיב','קמצן','עצלן','גאה'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Patient"</span><br><br>משפט לדוגמה: <i>"Be patient, good things take time."</i>',q:'What does "patient" mean?',a:['סבלני','מהיר','חזק','חריף'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Ancient"</span><br><br>משפט לדוגמה: <i>"Jerusalem is an ancient city."</i>',q:'What does "ancient" mean?',a:['עתיק מאוד','חדש','קטן','גדול'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Grateful"</span><br><br>משפט לדוגמה: <i>"I am grateful for my family."</i>',q:'What does "grateful" mean?',a:['אסיר תודה','כועס','שמח','עצוב'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Achieve"</span><br><br>משפט לדוגמה: <i>"You can achieve anything you work for."</i>',q:'What does "achieve" mean?',a:['להשיג / להצליח','לכשול','לשכוח','לישון'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Responsible"</span><br><br>משפט לדוגמה: <i>"He is a responsible student."</i>',q:'What does "responsible" mean?',a:['אחראי','עצלן','פחדן','עצבני'],c:0,timer:30},
+  {title:'דקדוק אנגלי',tx:'<b>Grammar tip:</b><br>בשאלות עם <span style="color:var(--gold);font-weight:900">Do/Does</span>:<br><br>• I/You/We/They → <b>Do</b><br>• He/She/It → <b>Does</b><br><br>דוגמה: <i>"Does he play football?"</i>',q:'מתי משתמשים ב-"Does" (ולא "Do")?',a:['עם he/she/it','עם I','עם they','עם we'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Enormous"</span><br><br>משפט לדוגמה: <i>"The whale is enormous."</i>',q:'What does "enormous" mean?',a:['עצום / ענקי','קטן','יפה','מהיר'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Challenge"</span><br><br>משפט לדוגמה: <i>"Every challenge makes you stronger."</i>',q:'What does "challenge" mean?',a:['אתגר','חבר','עזרה','שאלה'],c:0,timer:30},
+  {title:'מילה באנגלית',tx:'<b>Word of the day:</b><br><span style="font-size:26px;font-weight:900;color:var(--gold)">"Persevere"</span><br><br>משפט לדוגמה: <i>"Persevere and you will succeed."</i>',q:'What does "persevere" mean?',a:['להתמיד / להמשיך','לוותר','לנוח','לשכוח'],c:0,timer:30},
+],
+hebrew:[
+  {title:'עברית יומית',tx:'<b>בניין הפועל:</b><br><br>השורש <span style="font-size:22px;font-weight:900;color:var(--gold)">כ.ת.ב</span> – "לכתוב"<br><br>• בניין <b>קל</b>: כָּתַב (פעל פשוט)<br>• בניין <b>פיעל</b>: כִּתֵּב (הכתיב לאחרים)<br>• בניין <b>נפעל</b>: נִכְתַּב (נכתב על ידי אחר)',q:'בניין "קל" מבטא:',a:['פעולה פשוטה שהאדם עושה','פעולה שנעשית לאדם','פעולה שגורמים לאחר לעשות','פעולה הדדית'],c:0,timer:30},
+  {title:'עברית יומית',tx:'<b>רבים ויחיד:</b><br><br>• יֶלֶד ← <span style="color:var(--gold);font-weight:900">יְלָדִים</span><br>• יַלְדָּה ← <span style="color:var(--gold);font-weight:900">יְלָדוֹת</span><br>• עֵץ ← <span style="color:var(--gold);font-weight:900">עֵצִים</span><br>• אִשָּׁה ← <span style="color:var(--gold);font-weight:900">נָשִׁים</span> (רבים לא סדיר!)',q:'מה רבים של "אישה"?',a:['נשים','אישות','אישות','אשות'],c:0,timer:30},
+  {title:'עברית יומית',tx:'<b>ניקוד:</b><br><br>• קָמַץ ( ָ ) = צליל "א"<br>• פַּתַח ( ַ ) = צליל "א"<br>• חִירִיק ( ִ ) = צליל "י"<br>• צֵירֵי ( ֵ ) = צליל "אֵ"<br>• חוֹלָם ( ֹ ) = צליל "אוֹ"',q:'מה הצליל של "חִירִיק"?',a:['"י"','"א"','"אֵ"','"אוֹ"'],c:0,timer:30},
+  {title:'עברית יומית',tx:'<b>ביטוי יומי:</b><br><br><span style="font-size:20px;font-weight:900;color:var(--gold)">"נפל לו האסימון"</span><br><br>ביטוי שמשמעותו: פתאום הבין משהו שלא הבין קודם. הגיע לו הבנה לאחר זמן.',q:'מה משמעות הביטוי "נפל לו האסימון"?',a:['הבין פתאום','שכח משהו','כעס','הצליח'],c:0,timer:30},
+  {title:'עברית יומית',tx:'<b>שורש:</b><br><br>השורש <span style="font-size:22px;font-weight:900;color:var(--gold)">ל.מ.ד</span><br><br>מילים מהשורש:<br>• לָמַד • לִימֵּד • לִמּוּד<br>• תַּלְמִיד • מוֹרֶה (מ-ה.ר.ה)<br>• בֵּית-סֵפֶר • לוּחַ',q:'מה הפועל שנגזר מהשורש ל.מ.ד בבניין קל?',a:['לָמַד','לִימֵּד','נִלְמַד','הִלְמִיד'],c:0,timer:30},
+  {title:'עברית יומית',tx:'<b>פנקטואציה (סימני פיסוק):</b><br><br>• <b>נקודה (.)</b> – סוף משפט<br>• <b>פסיק (,)</b> – הפסקה קצרה<br>• <b>סימן שאלה (?)</b> – שאלה<br>• <b>קו מפריד (–)</b> – הבהרה או הפסקה ארוכה<br>• <b>נקודתיים (:)</b> – לפני רשימה',q:'באיזה סימן פיסוק משתמשים לפני רשימה?',a:['נקודתיים (:)','פסיק (,)','נקודה (.)','מקף (-)'],c:0,timer:30},
+  {title:'עברית יומית',tx:'<b>שמות עצם:</b><br><br>• שם עצם <b>פרטי</b>: שם של אדם/מקום – "ירושלים", "יוסף"<br>• שם עצם <b>כללי</b>: דבר כללי – "עיר", "ילד"<br>• שם עצם <b>מופשט</b>: מושג – "אהבה", "שמחה"',q:'לאיזה סוג שייך "ירושלים"?',a:['שם עצם פרטי','שם עצם כללי','שם עצם מופשט','שם תואר'],c:0,timer:30},
+  {title:'עברית יומית',tx:'<b>ביטוי יומי:</b><br><br><span style="font-size:20px;font-weight:900;color:var(--gold)">"ללכת נגד הזרם"</span><br><br>משמעות: לא ללכת עם כולם, לעשות מה שנראה לך נכון גם אם אחרים עושים אחרת. עצמאות בדעה.',q:'מה משמעות "ללכת נגד הזרם"?',a:['לעשות מה שנראה לך נכון, גם אחרת מאחרים','ללכת בנהר','לרוץ מהר','להסכים עם כולם'],c:0,timer:30},
+],
+science:[
+  {title:'מדע יומי',tx:'<b>כדור הארץ:</b><br><br>• הכדור סובב סביב השמש בכ-<span style="color:var(--gold);font-weight:900">365 יום</span><br>• סיבוב סביב עצמו = יממה (<span style="color:var(--gold);font-weight:900">24 שעות</span>)<br>• הציר נטוי – גורם לעונות השנה<br>• כ-71% ממנו מכוסה מים',q:'כמה יממות לוקח לכדור הארץ לסוב פעם אחת סביב השמש?',a:['365','24','12','100'],c:0,timer:30},
+  {title:'מדע יומי',tx:'<b>המים:</b><br><br>• נוסחה כימית: <span style="color:var(--gold);font-weight:900;font-size:20px">H₂O</span><br>• כולל: 2 אטומי מימן + 1 אטום חמצן<br>• רותח ב-100°C, קופא ב-0°C<br>• 71% מפני כדור הארץ הם מים',q:'מה הנוסחה הכימית של מים?',a:['H₂O','CO₂','O₂','H₂O₂'],c:0,timer:30},
+  {title:'מדע יומי',tx:'<b>פוטוסינתזה:</b><br><br>תהליך שבו צמחים מייצרים מזון מאור שמש.<br><br>• <span style="color:var(--gold)">קולטים</span>: CO₂ + מים + אור שמש<br>• <span style="color:var(--green)">מפרישים</span>: חמצן (O₂) + גלוקוז<br><br>כלורופיל = הפיגמנט הירוק שמאפשר זאת.',q:'מה הגז שצמחים מפרישים בפוטוסינתזה?',a:['חמצן (O₂)','פחמן דו-חמצני (CO₂)','מימן','חנקן'],c:0,timer:30},
+  {title:'מדע יומי',tx:'<b>מערכת השמש:</b><br><br>• 8 כוכבי לכת: עכשיו, נוגה, ארץ, מאדים, צדק, שבתאי, אורנוס, נפטון<br>• <span style="color:var(--gold);font-weight:900">צדק</span> – הגדול ביותר<br>• <span style="color:var(--gold);font-weight:900">כוכב חמה (עכשיו)</span> – הקרוב לשמש<br>• פלוטו – <b>גמד כוכבי</b>, לא כוכב לכת',q:'מהו כוכב הלכת הגדול ביותר במערכת השמש?',a:['צדק','שבתאי','ארץ','נפטון'],c:0,timer:30},
+  {title:'מדע יומי',tx:'<b>גוף האדם:</b><br><br>• <span style="color:var(--gold);font-weight:900">206</span> עצמות בגוף בוגר<br>• <span style="color:var(--gold);font-weight:900">37 טריליון</span> תאים (בקירוב)<br>• הלב פועם כ-100,000 פעמים ביום<br>• הריאות מכניסות אוויר ~20,000 פעמים ביום',q:'כמה עצמות יש בגוף האדם הבוגר?',a:['206','186','226','106'],c:0,timer:30},
+  {title:'מדע יומי',tx:'<b>חשמל:</b><br><br>• חשמל = זרימת אלקטרונים<br>• <span style="color:var(--gold)">מוליכים</span>: מתכות (נחושת, ברזל)<br>• <span style="color:var(--gold)">מבודדים</span>: פלסטיק, גומי, עץ<br>• ברק = פריקה חשמלית טבעית<br>• יחידת מדידה: וולט (V), אמפר (A)',q:'מה דוגמה למוליך חשמל טוב?',a:['נחושת','פלסטיק','עץ','גומי'],c:0,timer:30},
+  {title:'מדע יומי',tx:'<b>המצבים של חומר:</b><br><br>• <span style="color:var(--gold)">מוצק</span>: צורה וגודל קבועים (קרח)<br>• <span style="color:var(--gold)">נוזל</span>: גודל קבוע, מתאים לכלי (מים)<br>• <span style="color:var(--gold)">גז</span>: מתפשט לכל המקום (אוויר)<br>• מעבר: המסה, התאדות, קיפאון',q:'באיזה מצב לחומר יש צורה וגודל קבועים?',a:['מוצק','נוזל','גז','פלזמה'],c:0,timer:30},
+  {title:'מדע יומי',tx:'<b>מהירות האור:</b><br><br>• מהירות האור בריק: <span style="color:var(--gold);font-weight:900">~300,000 ק"מ בשנייה</span><br>• אור מהשמש מגיע לארץ תוך ~8 דקות<br>• "שנת אור" = המרחק שאור עובר בשנה<br>• אור כוכבים שאנו רואים – נסע אלפי שנים!',q:'כמה זמן לוקח לאור השמש להגיע לכדור הארץ?',a:['כ-8 דקות','כ-8 שניות','כ-8 שעות','כ-8 ימים'],c:0,timer:30},
+],
+general:[
+  {title:'ידע כללי',tx:'<b>ישראל – עובדות:</b><br><br>• בירה: <span style="color:var(--gold);font-weight:900">ירושלים</span><br>• שפות רשמיות: עברית וערבית<br>• שטח: כ-22,000 קמ"ר<br>• אוכלוסייה: כ-9.5 מיליון<br>• יום עצמאות: ה׳ באייר',q:'מה בירת מדינת ישראל?',a:['ירושלים','תל אביב','חיפה','באר שבע'],c:0,timer:30},
+  {title:'ידע כללי',tx:'<b>התנ"ך:</b><br><br>• <span style="color:var(--gold);font-weight:900">24</span> ספרים בתנ"ך<br>• מחולק ל-3 חלקים: תורה, נביאים, כתובים<br>• תורה: 5 ספרים<br>• נביאים: 8 ספרים<br>• כתובים: 11 ספרים',q:'כמה ספרים יש בתנ"ך?',a:['24','22','39','12'],c:0,timer:30},
+  {title:'ידע כללי',tx:'<b>ספורט – כדורגל:</b><br><br>• כל קבוצה: <span style="color:var(--gold);font-weight:900">11 שחקנים</span> במגרש<br>• משחק: 90 דקות (2 × 45)<br>• גביע העולם: כל 4 שנים<br>• הכדורגלן שניצח הכי הרבה: ליאונל מסי (ארגנטינה)',q:'כמה שחקנים משחקים בכל קבוצת כדורגל?',a:['11','9','12','10'],c:0,timer:30},
+  {title:'ידע כללי',tx:'<b>גאוגרפיה:</b><br><br>• הנהר הארוך ביותר: <span style="color:var(--gold);font-weight:900">הנילוס</span> (6,650 ק"מ) / האמזון<br>• ההר הגבוה ביותר: <span style="color:var(--gold);font-weight:900">אוורסט</span> (8,849 מ׳)<br>• היבשת הגדולה: אסיה<br>• האוקיינוס הגדול: האוקיינוס השקט',q:'מה שם ההר הגבוה ביותר בעולם?',a:['אוורסט','קילימנג\'רו','הימלאיה','מון בלאן'],c:0,timer:30},
+  {title:'ידע כללי',tx:'<b>ספורט – כדורסל:</b><br><br>• כל קבוצה: <span style="color:var(--gold);font-weight:900">5 שחקנים</span> במגרש<br>• משחק: 4 רבעים × 10 דקות (FIBA)<br>• סל = 2 נקודות, שלשה = 3, עונשין = 1<br>• NBA – ליגת הכדורסל המפורסמת בעולם',q:'כמה שחקנים משחקים בכל קבוצת כדורסל?',a:['5','6','7','4'],c:0,timer:30},
+  {title:'ידע כללי',tx:'<b>המצאות:</b><br><br>• מחשב: <span style="color:var(--gold)">~1940</span><br>• טלפון: <span style="color:var(--gold)">1876</span> – אלכסנדר גרהם בל<br>• חשמל (נורה): <span style="color:var(--gold)">1879</span> – תומס אדיסון<br>• אינטרנט: <span style="color:var(--gold)">1969</span> (ARPANET)<br>• טלפון חכם: <span style="color:var(--gold)">2007</span> – אייפון ראשון',q:'מי המציא את הטלפון?',a:['אלכסנדר גרהם בל','תומס אדיסון','ניקולה טסלה','סטיב ג\'ובס'],c:0,timer:30},
+  {title:'ידע כללי',tx:'<b>חיות:</b><br><br>• הדג הגדול: <span style="color:var(--gold)">לוויתן כחול</span> – עד 30 מ׳ ו-200 טון<br>• החיה הכי מהירה: <span style="color:var(--gold)">ברדלס</span> – עד 120 קמ"ש<br>• חיה שחיה הכי הרבה: <span style="color:var(--gold)">צב</span> – עד 200 שנה<br>• אריה – "מלך החיות"',q:'מהי החיה הכי מהירה ביבשה?',a:['ברדלס (צ\'יטה)','אריה','נמר','סוס'],c:0,timer:30},
+  {title:'ידע כללי',tx:'<b>ארץ ישראל – ים המלח:</b><br><br>• ים המלח הוא <span style="color:var(--gold);font-weight:900">הנמוך ביותר בעולם</span> (430 מ׳ מתחת לפני הים)<br>• המים מלוחים פי 10 מהים הרגיל<br>• אי אפשר לטבוע בו – הצפיפות גבוהה<br>• אין בו דגים',q:'מה מיוחד בים המלח?',a:['הנמוך ביותר בעולם ולא ניתן לטבוע בו','הגדול בעולם','הקר בעולם','הכי כחול בעולם'],c:0,timer:30},
+],
+};
+
+const STUDY_META={
+  math:   {badge:'🔢',title:'חשבון יומי – תרגיל'},
+  english:{badge:'🇬🇧',title:'אנגלית – מילה יומית'},
+  hebrew: {badge:'📝',title:'עברית – שאלה יומית'},
+  science:{badge:'🔬',title:'מדעים – עובדה יומית'},
+  general:{badge:'🌍',title:'ידע כללי – שאלה יומית'},
+};
+
+const CATEGORIES=[
+  {id:'prayer',icon:'🕌',title:'תפילות',tasks:[
+    {id:'shacharit',name:'תפילת שחרית',pts:10,timeSlot:'shacharit'},
+    {id:'mincha',name:'תפילת מנחה',pts:10,timeSlot:'mincha'},
+    {id:'arvit',name:'תפילת ערבית',pts:10,timeSlot:'arvit'},
+    {id:'shabbat_prayer',name:'תפילות שבת',pts:15,timeSlot:'shabbat'},
+    {id:'minyan',name:'תפילה במניין',pts:12},
+    {id:'ontime',name:'הגעה בזמן לבית הכנסת',pts:8},
+  ]},
+  {id:'torah',icon:'📖',title:'לימוד תורה',tasks:[
+    {id:'mishna_daily',name:'5 משניות + שאלת הבנה',pts:12,interactive:'mishna',icon:'📜'},
+    {id:'halacha_daily',name:'הלכה יומית + שאלת הבנה',pts:10,interactive:'halacha',icon:'⚖️'},
+    {id:'torah_video',name:'סרטון תורה + שאלה',pts:8,interactive:'video',icon:'🎬'},
+    {id:'learn_with',name:'לימוד עם אבא / חבר',pts:15},
+    {id:'pasuk',name:'שינון פסוק',pts:10,interactive:'pasuk',icon:'📜'},
+  ]},
+  {id:'study',icon:'📚',title:'לימודים',tasks:[
+    {id:'math',   name:'חשבון – תרגיל יומי',   pts:10,interactive:'study',subject:'math',   icon:'🔢'},
+    {id:'english',name:'אנגלית – מילה יומית',   pts:10,interactive:'study',subject:'english',icon:'🇬🇧'},
+    {id:'hebrew', name:'עברית – שאלה יומית',    pts:10,interactive:'study',subject:'hebrew', icon:'📝'},
+    {id:'science',name:'מדעים – עובדה יומית',   pts:10,interactive:'study',subject:'science',icon:'🔬'},
+    {id:'general',name:'ידע כללי – שאלה יומית', pts:8, interactive:'study',subject:'general',icon:'🌍'},
+  ]},
+  {id:'sport',icon:'⚽',title:'ספורט',tasks:[
+    {id:'pushups',name:'שכיבות סמיכה',pts:8,sport:{target:10,unit:'שכיבות',emoji:'💪'}},
+    {id:'situps',name:'כפיפות בטן',pts:8,sport:{target:15,unit:'כפיפות',emoji:'🏋️'}},
+    {id:'run',name:'ריצה / הליכה (20 דק׳)',pts:12},
+    {id:'bike',name:'רכיבה על אופניים',pts:10},
+    {id:'ball',name:'כדורגל / כדורסל עם חברים',pts:12},
+    {id:'sport_other',name:'פעילות גופנית נוספת',pts:8},
+  ]},
+  {id:'chesed',icon:'🤲',title:'גמילות חסדים ועזרה לזולת',tasks:[
+    {id:'ml_sh',name:'מל"ש – שירות קהילתי',pts:15},
+    {id:'grandparents',name:'ביקור / שיחה עם סבא וסבתא',pts:12},
+    {id:'visit_sick',name:'ביקור חולה',pts:12},
+    {id:'house_help',name:'עזרה בבית',pts:7},
+    {id:'neighbor_help',name:'עזרה לשכן',pts:10},
+    {id:'siblings',name:'משחק עם אחים בסבלנות',pts:6},
+    {id:'friend_cheer',name:'עידוד חבר שמוטרד',pts:8},
+    {id:'tzedaka',name:'נתינת צדקה',pts:8},
+    {id:'host_guest',name:'הכנסת אורחים',pts:10},
+  ]},
+];
+
+// ============================================================
+// HEBREW CALENDAR
+// ============================================================
+const HEB_MONTHS=[
+  {y:5786,m:'ניסן',  gd:new Date(2026,2,18)},{y:5786,m:'אייר', gd:new Date(2026,3,17)},
+  {y:5786,m:'סיון', gd:new Date(2026,4,16)},{y:5786,m:'תמוז',gd:new Date(2026,5,15)},
+  {y:5786,m:'אב',   gd:new Date(2026,6,14)},{y:5786,m:'אלול',gd:new Date(2026,7,13)},
+  {y:5787,m:'תשרי',gd:new Date(2026,8,11)},
+];
+const HN=['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'];
+const HEB_DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+function getHD(){const d=new Date();d.setHours(0,0,0,0);for(let i=HEB_MONTHS.length-1;i>=0;i--){const s=HEB_MONTHS[i];const diff=Math.round((d-s.gd)/86400000);if(diff>=0)return`${HN[diff+1]||diff+1} ${s.m} ${s.y===5786?'תשפ״ו':'תשפ״ז'}`;}return '';}
+
+// ============================================================
+// TIME
+// ============================================================
+const PRAYER_WIN={shacharit:{s:5,e:14},mincha:{s:12,e:20},arvit:{s:18,e:30}};
+function getPrayerState(slot){if(!slot||slot==='shabbat')return 'available';const h=new Date().getHours();const hh=h<5?h+24:h;const w=PRAYER_WIN[slot];if(!w)return 'available';if(hh>=w.s&&hh<w.e)return 'current';if(hh>=w.e)return 'past';return 'future';}
+function isShabbat(){const d=new Date().getDay(),h=new Date().getHours();return d===6||(d===5&&h>=18);}
+function getSlot(){const h=new Date().getHours(),d=new Date().getDay();if(d===6||(d===5&&h>=18))return 'shabbat';if(h>=5&&h<14)return 'shacharit';if(h>=12&&h<20)return 'mincha';return 'arvit';}
+function timeBannerHTML(){const s=getSlot(),d=new Date().getDay();if(s==='shabbat')return `<div class="time-banner shabbat"><div style="font-size:24px">🕯️</div><div><div class="tb-title">${d===6?'שבת שלום! 🕯️':'ערב שבת – שבת שלום!'}</div><div class="tb-sub">${d===6?'יום מנוחה קדוש':'הכנס בזמן לקבלת שבת'}</div></div></div>`;
+const b={shacharit:{i:'🌅',t:'זמן שחרית – בוקר טוב!',s:'עכשיו זמן תפילת שחרית',c:'shacharit'},mincha:{i:'☀️',t:'זמן מנחה – אחר הצהריים',s:'אל תשכח להתפלל מנחה',c:'mincha'},arvit:{i:'🌙',t:'ערב טוב – זמן ערבית',s:'התפלל ערבית לפני השינה',c:'arvit'}}[s];
+return `<div class="time-banner ${b.c}"><div style="font-size:22px" class="pulse">${b.i}</div><div><div class="tb-title">${b.t}</div><div class="tb-sub">${b.s}</div></div></div>`;}
+
+// ============================================================
+// DAILY INDEX
+// ============================================================
+function dayIdx(){const e=new Date(2026,5,1);const d=new Date();d.setHours(0,0,0,0);return Math.max(0,Math.floor((d-e)/86400000));}
+function dailyMishnaSet(){return MISHNA_SETS[dayIdx()%MISHNA_SETS.length];}
+function dailyHalacha(){return HALACHOT[dayIdx()%HALACHOT.length];}
+function dailyVideo(){return VIDEOS[dayIdx()%VIDEOS.length];}
+function dailyBonus(){return BONUS_POOL[dayIdx()%BONUS_POOL.length];}
+
+// ============================================================
+// FIREBASE CONFIG — הכנס כאן את כתובת ה-Database שלך
+// ============================================================
+// הוראות: console.firebase.google.com → צור פרויקט → Realtime Database → צור DB → העתק את ה-URL
+// דוגמה: 'https://MY-PROJECT-default-rtdb.firebaseio.com'
+const FB_URL = localStorage.getItem('ak_fb_url') || 'https://n1t2n3i4-default-rtdb.firebaseio.com';
+
+async function fbSet(path, data){
+  if(!FB_URL)return;
+  try{await fetch(`${FB_URL}/${path}.json`,{method:'PUT',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});}
+  catch(e){console.warn('Firebase write error',e);}
+}
+async function fbGet(path){
+  if(!FB_URL)return null;
+  try{const r=await fetch(`${FB_URL}/${path}.json`);return await r.json();}
+  catch(e){return null;}
+}
+async function fbGetAllUsers(){
+  const data=await fbGet('ak_users');
+  return data||{};
+}
+async function fbSyncUser(un,userData){
+  if(!FB_URL||!un||un==='__admin__')return;
+  // strip days to save bandwidth — sync only totals
+  const slim={name:userData.name,cls:userData.cls||'',totalPts:userData.totalPts||0,
+    tasksCompleted:userData.tasksCompleted||0,activeDays:userData.activeDays||0,
+    streak:userData.streak||0,lastDay:userData.lastDay||'',pass:userData.pass||''};
+  // save today's day data too
+  const tk=todayKey();
+  if(userData.days&&userData.days[tk])slim.todayData=userData.days[tk];
+  await fbSet(`ak_users/${un}`,slim);
+}
+
+// ============================================================
+// STORAGE
+// ============================================================
+function getUsers(){try{return JSON.parse(localStorage.getItem('ak_users')||'{}')}catch{return {}}}
+function saveUsers(u){localStorage.setItem('ak_users',JSON.stringify(u))}
+function cur(){return localStorage.getItem('ak_current')||''}
+function setCur(u){localStorage.setItem('ak_current',u)}
+function getUD(un){return getUsers()[un]||null}
+function saveUD(un,d){const u=getUsers();u[un]=d;saveUsers(u);fbSyncUser(un,d);}
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function getDD(un){const u=getUD(un);if(!u)return{checked:{},bonusDone:false};if(!u.days)u.days={};if(!u.days[todayKey()])u.days[todayKey()]={checked:{},bonusDone:false};return u.days[todayKey()];}
+function saveDD(un,dd){const u=getUD(un);if(!u)return;if(!u.days)u.days={};u.days[todayKey()]=dd;saveUD(un,u);}
+
+// ============================================================
+// AUTH
+// ============================================================
+function switchAuthTab(t){document.getElementById('tabLogin').classList.toggle('active',t==='login');document.getElementById('tabReg').classList.toggle('active',t==='register');document.getElementById('loginForm').style.display=t==='login'?'':'none';document.getElementById('registerForm').style.display=t==='register'?'':'none';}
+const ADMIN_PASS='admin123';
+function toggleAdminEntry(){const el=document.getElementById('adminEntry');el.style.display=el.style.display==='none'?'':'none';if(el.style.display!=='none')document.getElementById('adminPassInput').focus();}
+function doAdminLogin(){const p=document.getElementById('adminPassInput').value;const e=document.getElementById('adminErr');if(!p){e.textContent='הכנס סיסמה';return;}if(p===ADMIN_PASS){e.textContent='';document.getElementById('adminPassInput').value='';document.getElementById('adminEntry').style.display='none';setCur('__admin__');enterAdminMode();}else{e.textContent='סיסמה שגויה';}}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('adminEntry')&&document.getElementById('adminEntry').style.display!=='none'&&document.activeElement===document.getElementById('adminPassInput'))doAdminLogin();});
+function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase();const p=document.getElementById('loginPass').value;const e=document.getElementById('loginErr');if(!u||!p){e.textContent='מלא את כל השדות';return;}const us=getUsers();if(!us[u]){e.textContent='שם משתמש לא קיים';return;}if(us[u].pass!==btoa(p)){e.textContent='סיסמה שגויה';return;}setCur(u);enterApp();}
+function doRegister(){const n=document.getElementById('regName').value.trim();const u=document.getElementById('regUser').value.trim().toLowerCase().replace(/\s+/g,'');const cl=document.getElementById('regClass').value;const p=document.getElementById('regPass').value;const e=document.getElementById('regErr');if(!n||!u||!cl||!p){e.textContent='מלא את כל השדות';return;}if(p.length<4){e.textContent='סיסמה קצרה מדי';return;}const us=getUsers();if(us[u]){e.textContent='שם משתמש תפוס';return;}us[u]={name:n,cls:cl,pass:btoa(p),totalPts:0,days:{},tasksCompleted:0,activeDays:0,streak:0,lastDay:''};saveUsers(us);setCur(u);enterApp();}
+// doLogout defined in admin section below
+function enterApp(){document.getElementById('authScreen').classList.remove('active');document.getElementById('mainScreen').classList.add('active');showPage('home');}
+window.onload=function(){const c=cur();if(c==='__admin__')enterAdminMode();else if(c&&getUD(c))enterApp();};
+
+// ============================================================
+// PAGES
+// ============================================================
+function showPage(page){['pageHome','pageLeaderboard','pageProfile'].forEach(id=>document.getElementById(id).style.display='none');['navHome','navLb','navProfile'].forEach(id=>document.getElementById(id).classList.remove('active'));const pm={home:'pageHome',leaderboard:'pageLeaderboard',profile:'pageProfile'};const nm={home:'navHome',leaderboard:'navLb',profile:'navProfile'};document.getElementById(pm[page]).style.display='';document.getElementById(nm[page]).classList.add('active');if(page==='home')renderHome();else if(page==='leaderboard')renderLB();else renderProfile();}
+
+// ============================================================
+// RANKS
+// ============================================================
+function getRank(p){let r=RANKS[0];for(const k of RANKS)if(p>=k.min)r=k;return r;}
+function nextRank(p){for(let i=RANKS.length-1;i>=0;i--)if(p<RANKS[i].min)return RANKS[i];return null;}
+
+// ============================================================
+// HOME
+// ============================================================
+function renderHome(){
+  const un=cur();const u=getUD(un);if(!u)return;
+  document.getElementById('topAvatar').textContent=(u.name||'?')[0];
+  document.getElementById('topName').textContent=u.name.split(' ')[0];
+  const rk=getRank(u.totalPts||0);
+  document.getElementById('topPts').textContent=`${u.totalPts||0} נק׳ · ${rk.icon} ${rk.name}`;
+  document.getElementById('hdateBar').innerHTML=`יום ${HEB_DAYS[new Date().getDay()]} · <span>${getHD()}</span>`;
+  document.getElementById('timeBanner').innerHTML=timeBannerHTML();
+  const dd=getDD(un);
+  let dayPts=0,done=0,total=0;
+  CATEGORIES.forEach(cat=>cat.tasks.forEach(t=>{total++;if(dd.checked[t.id]){done++;dayPts+=t.pts;}}));
+  const bonus=dailyBonus();total++;if(dd.bonusDone){done++;dayPts+=bonus.pts;}
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('dayProgressBar').style.width=pct+'%';
+  document.getElementById('dayPts').textContent=dayPts;
+  document.getElementById('dayDone').textContent=`${done}/${total} משימות`;
+  document.getElementById('rankIcon').textContent=rk.icon;
+  document.getElementById('rankName').textContent=rk.name;
+  const nx=nextRank(u.totalPts||0);
+  document.getElementById('rankNext').textContent=nx?`עוד ${nx.min-(u.totalPts||0)} נק׳ ל${nx.name}`:'הגעת לדרגה הגבוהה! 🎉';
+  // bonus
+  const bc=document.getElementById('bonusCard');
+  if(dd.bonusDone){bc.className='bonus-card done-bonus';bc.innerHTML=`<div style="font-size:20px">✅</div><div style="flex:1"><div style="font-weight:800;font-size:13px;color:var(--muted)">בונוס הושלם!</div><div style="font-size:11px;color:var(--muted)">${bonus.desc}</div></div>`;bc.onclick=null;}
+  else{
+    const hdate=getHD();
+    bc.className='bonus-card';
+    bc.innerHTML=`<div style="font-size:22px">${bonus.icon}</div><div style="flex:1"><div style="font-weight:800;font-size:13px;color:var(--green)">🎟️ טוקן יומי — ${hdate}</div><div style="font-size:12px;color:var(--text);margin-top:2px">${bonus.desc}</div></div><div class="bonus-pts">+${bonus.pts}</div>`;
+    bc.onclick=doBonus;
+  }
+  renderTasks(dd);
+}
+
+function renderTasks(dd){
+  const shab=isShabbat();
+  const list=document.getElementById('taskList');list.innerHTML='';
+  CATEGORIES.forEach(cat=>{
+    let tasks=cat.tasks;
+    if(cat.id==='prayer')tasks=shab?tasks.filter(t=>t.timeSlot==='shabbat'||!t.timeSlot):tasks.filter(t=>t.timeSlot!=='shabbat');
+    const done=tasks.filter(t=>dd.checked[t.id]).length;
+    const catPts=tasks.reduce((s,t)=>s+(dd.checked[t.id]?t.pts:0),0);
+    const sec=document.createElement('div');sec.className='cat-section';
+    sec.innerHTML=`<div class="cat-header" onclick="toggleCat('cat_${cat.id}',this)"><span style="font-size:18px">${cat.icon}</span><span class="cat-title">${cat.title}</span><span class="cat-progress">${done}/${tasks.length} · ${catPts} נק׳</span><span class="cat-toggle">▾</span></div><div class="cat-tasks" id="cat_${cat.id}"></div>`;
+    const td=sec.querySelector('.cat-tasks');
+    tasks.forEach(t=>{
+      const checked=!!dd.checked[t.id];
+      let pState=null;
+      if(cat.id==='prayer'&&t.timeSlot&&t.timeSlot!=='shabbat')pState=getPrayerState(t.timeSlot);
+      let cls='task-item';
+      if(checked)cls+=' checked';
+      else if(pState==='current')cls+=' prayer-current';
+      else if(pState==='future')cls+=' prayer-future';
+      else if(pState==='past')cls+=' prayer-past';
+      const item=document.createElement('div');item.className=cls;
+      const rightEl=checked
+        ?`<div class="task-done-v">✓</div>`
+        :`${t.interactive?`<span class="task-iicon">${t.icon}</span>`:t.sport?`<span class="task-iicon">${t.sport.emoji}</span>`:''}<div class="task-pts">+${t.pts}</div>`;
+      item.innerHTML=`<div class="task-check">${checked?'✓':''}</div><div class="task-name">${t.name}</div>${rightEl}`;
+      item.onclick=()=>onTaskClick(t,pState);
+      td.appendChild(item);
+    });
+    list.appendChild(sec);
+  });
+}
+
+function toggleCat(id,hdr){const div=document.getElementById(id);div.classList.toggle('collapsed');hdr.querySelector('.cat-toggle').textContent=div.classList.contains('collapsed')?'▸':'▾';}
+
+// ============================================================
+// TASK CLICK – no uncheck, prayer lock
+// ============================================================
+function onTaskClick(t,pState){
+  const un=cur();const u=getUD(un);if(!u)return;
+  const dd=getDD(un);
+  if(dd.checked[t.id]){showToast('✅ כבר בוצע היום!','warn');return;}
+  if(pState==='past'){showToast('⏰ חלף הזמן לתפילה זו','warn');return;}
+  if(pState==='future'){showToast(`🔒 עוד לא הגיע הזמן`,'warn');return;}
+  if(t.interactive){openLearnModal(t.interactive,t.id,t.pts,t.subject);return;}
+  if(t.sport){openSportModal(t);return;}
+  completeTask(t.id,t.pts);
+}
+
+function completeTask(tid,pts){
+  const un=cur();
+  // ── Load ONE fresh copy, modify it, save ONCE ──
+  const u=getUD(un);if(!u)return;
+  if(!u.days)u.days={};
+  const k=todayKey();
+  if(!u.days[k])u.days[k]={checked:{},bonusDone:false};
+  const dd=u.days[k];
+  if(dd.checked[tid]){showToast('✅ כבר בוצע היום!','warn');return;} // anti-cheat guard
+  const prevRank=getRank(u.totalPts||0).name;
+  dd.checked[tid]=true;
+  u.totalPts=(u.totalPts||0)+pts;
+  u.tasksCompleted=(u.tasksCompleted||0)+1;
+  updActiveDays(un,u);
+  saveUD(un,u); // single save – no race condition
+  showToast(`+${pts} נקודות! 🎉`,'pts');
+  if(getRank(u.totalPts).name!==prevRank)setTimeout(()=>showRankUp(getRank(u.totalPts)),600);
+  renderHome();
+}
+
+function doBonus(){
+  const un=cur();
+  const u=getUD(un);if(!u)return;
+  if(!u.days)u.days={};
+  const k=todayKey();
+  if(!u.days[k])u.days[k]={checked:{},bonusDone:false};
+  const dd=u.days[k];
+  if(dd.bonusDone)return;
+  const b=dailyBonus();const prevRank=getRank(u.totalPts||0).name;
+  dd.bonusDone=true;
+  u.totalPts=(u.totalPts||0)+b.pts;
+  u.tasksCompleted=(u.tasksCompleted||0)+1;
+  updActiveDays(un,u);
+  saveUD(un,u); // single save
+  showToast(`+${b.pts} בונוס! ⭐`,'pts');
+  if(getRank(u.totalPts).name!==prevRank)setTimeout(()=>showRankUp(getRank(u.totalPts)),400);
+  renderHome();
+}
+
+function updActiveDays(un,u){const k=todayKey();if(u.lastDay!==k){const y=new Date();y.setDate(y.getDate()-1);const yk=y.toISOString().slice(0,10);u.streak=u.lastDay===yk?(u.streak||0)+1:1;u.activeDays=(u.activeDays||0)+1;u.lastDay=k;}}
+
+// ============================================================
+// LEARN MODAL – with 60s timer + one-time answer
+// ============================================================
+let _ltid=null,_lpts=0,_lFullPts=0,_lAnswered=false,_timerInt=null;
+
+function openLearnModal(type,tid,pts,subject){
+  _ltid=tid;_lAnswered=false;_lFullPts=pts;_lpts=5;
+  clearInterval(_timerInt);
+  document.getElementById('mHdate').textContent=getHD();
+  document.getElementById('mConfirm').style.display='none';
+  let badge='📖',badgeText='לימוד',body='';
+
+  if(type==='mishna'){
+    const set=dailyMishnaSet();
+    badge='📜';badgeText='5 משניות + שאלת הבנה';
+    document.getElementById('mTitle').textContent=set.title;
+    const mishnaText=set.idx.map((i,n)=>{const m=MISH[i%MISH.length];return`משנה ${n+1}: ${m.t}`;}).join(' ');
+    body=`<button onclick="speakText(${JSON.stringify(mishnaText)})" style="display:flex;align-items:center;gap:6px;background:rgba(107,255,184,0.1);border:1.5px solid rgba(107,255,184,0.3);border-radius:10px;color:#6bffb8;font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer;margin-bottom:10px;font-family:inherit;" id="speakBtn">🔊 האזן לכל המשניות</button>`;
+    body+=set.idx.map((i,n)=>{const m=MISH[i%MISH.length];return`<div class="mishna-card"><div class="mishna-num">משנה ${n+1} · ${m.r}</div><div class="mishna-text">${m.t}</div><div class="mishna-summary">💡 ${m.s}</div></div>`;}).join('');
+    body+=buildQuestion(set.q,set.a,set.c,pts,set.timer||90);
+
+  }else if(type==='halacha'){
+    const h=dailyHalacha();
+    badge='⚖️';badgeText='הלכה יומית + שאלת הבנה';
+    document.getElementById('mTitle').textContent=h.t;
+    const halachaText=h.tx.replace(/\n/g,' ');
+    body=`<button onclick="speakText(${JSON.stringify(halachaText)})" style="display:flex;align-items:center;gap:6px;background:rgba(0,180,216,0.1);border:1.5px solid rgba(0,180,216,0.3);border-radius:10px;color:#00b4d8;font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer;margin-bottom:10px;font-family:inherit;" id="speakBtn">🔊 האזן להלכה</button>`;
+    body+=`<div class="modal-text">${h.tx.replace(/\n/g,'<br>')}</div><div class="modal-summary">📌 ${h.s}</div>`;
+    body+=buildQuestion(h.q,h.a,h.c,pts,h.timer||60);
+
+  }else if(type==='study'){
+    const pool=STUDY_CONTENT[subject]||[];
+    const entry=pool[dayIdx()%pool.length]||{title:'לימוד',tx:'',q:'?',a:['א','ב','ג','ד'],c:0,timer:30};
+    const meta=STUDY_META[subject]||{badge:'📚',title:'לימוד'};
+    badge=meta.badge; badgeText=meta.title;
+    document.getElementById('mTitle').textContent=entry.title;
+    const plainText=entry.tx.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+    body=`<div class="modal-text" style="font-size:14px;line-height:1.9">${entry.tx}</div>
+    <button onclick="speakText(${JSON.stringify(plainText)})" style="display:flex;align-items:center;gap:6px;background:rgba(0,180,216,0.12);border:1.5px solid rgba(0,180,216,0.3);border-radius:10px;color:#00b4d8;font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer;margin-bottom:10px;font-family:inherit;" id="speakBtn">🔊 האזן לתוכן</button>`;
+    body+=buildQuestion(entry.q,entry.a,entry.c,pts,entry.timer||60);
+
+  }else if(type==='pasuk'){
+    const psk=PESUKIM[dayIdx()%PESUKIM.length];
+    badge='📜';badgeText='שינון פסוק יומי';
+    document.getElementById('mTitle').textContent=psk.ref;
+    // Split into words and hide last 3
+    const words=psk.text.split(' ');
+    const visible=words.slice(0,-3).join(' ');
+    const hidden=words.slice(-3).join(' ');
+    body=`
+      <div class="modal-text" style="font-size:17px;line-height:2.1;text-align:center;font-weight:600">${psk.text}</div>
+      <button onclick="speakText(${JSON.stringify(psk.text)})" style="display:flex;align-items:center;gap:6px;background:rgba(107,255,184,0.1);border:1.5px solid rgba(107,255,184,0.3);border-radius:10px;color:#6bffb8;font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer;margin:8px 0;font-family:inherit;">🔊 האזן לפסוק</button>
+      <div class="question-box" style="margin-top:12px">
+        <div class="question-label">📝 השלם את הפסוק</div>
+        <div style="font-size:15px;font-weight:700;line-height:2;margin-bottom:12px;color:var(--text)">${visible} <span style="color:var(--muted);font-style:italic">... (השלם 3 מילים אחרונות)</span></div>
+        <button onclick="revealPasuk(${JSON.stringify(hidden)},${pts})" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--gold),var(--orange));color:#0a0e1a;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">אני יודע! גלה תשובה ✓</button>
+        <div id="pasukReveal" style="display:none;margin-top:10px;padding:11px;background:rgba(107,255,184,0.08);border:1.5px solid rgba(107,255,184,0.25);border-radius:10px;text-align:center;">
+          <div style="font-size:16px;font-weight:800;color:#6bffb8" id="pasukHiddenWords"></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:5px">האם ידעת? לחץ למטה</div>
+        </div>
+        <div id="pasukBtns" style="display:none;margin-top:10px;display:none;">
+          <button onclick="confirmPasukYes(${pts})" style="width:48%;padding:10px;border-radius:9px;border:none;background:rgba(107,255,184,0.15);border:1.5px solid rgba(107,255,184,0.4);color:#6bffb8;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:4%">✅ ידעתי!</button>
+          <button onclick="confirmPasukNo()" style="width:48%;padding:10px;border-radius:9px;border:none;background:rgba(255,107,107,0.1);border:1.5px solid rgba(255,107,107,0.3);color:#ff8080;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">❌ לא ידעתי</button>
+        </div>
+      </div>`;
+
+  }else if(type==='video'){
+    const v=dailyVideo();
+    badge='🎬';badgeText='סרטון תורה + שאלה';
+    document.getElementById('mTitle').textContent=v.t;
+    const url=v.url||`https://www.youtube.com/results?search_query=${encodeURIComponent(v.t)}`;
+    body=`<div class="modal-text">${v.d}</div><div class="modal-video-card"><div style="font-weight:700;margin-bottom:4px">${v.t}</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px">📺 ${v.ch}</div><a href="${url}" target="_blank" class="btn-watch" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;"><span style="font-size:18px">▶</span> צפה עכשיו ביוטיוב</a></div>`;
+    body+=buildQuestion(v.q2,v.a,v.c,pts,v.timer||60);
+  }
+
+  document.getElementById('mBadge').textContent=badge;
+  document.getElementById('mBadgeText').textContent=badgeText;
+  document.getElementById('mBody').innerHTML=body;
+  document.getElementById('learnModal').classList.add('open');
+
+  // start timer after DOM is ready
+  const timerEl=document.getElementById('qTimer');
+  const answersEl=document.getElementById('qAnswers');
+  if(timerEl&&answersEl){
+    answersEl.style.display='none';
+    const totalSecs=parseInt(timerEl.dataset.secs)||60;
+    let secs=totalSecs;
+    updateRing(secs,totalSecs);
+    _timerInt=setInterval(()=>{
+      secs--;
+      updateRing(secs,totalSecs);
+      if(secs<=0){
+        clearInterval(_timerInt);
+        timerEl.style.display='none';
+        answersEl.style.display='';
+      }
+    },1000);
+  }
+}
+
+function buildQuestion(q,answers,correct,fullPts,timerSecs){
+  const btns=answers.map((a,i)=>`<button class="answer-btn" id="abtn${i}" onclick="selectAnswer(${i},${correct},${fullPts})">${a}</button>`).join('');
+  return `<div class="question-box">
+    <div class="question-label">📝 שאלת הבנה</div>
+    <div class="question-text">${q}</div>
+    <div id="qTimer" data-secs="${timerSecs}" class="timer-wrap">
+      <svg width="68" height="68" viewBox="0 0 68 68">
+        <circle cx="34" cy="34" r="26" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="4"/>
+        <circle id="timerRing" cx="34" cy="34" r="26" fill="none" stroke="#f7c948" stroke-width="4" stroke-linecap="round"
+          stroke-dasharray="163" stroke-dashoffset="0" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset 1s linear;"/>
+        <text id="timerNum" x="34" y="39" text-anchor="middle" fill="#f7c948" font-size="16" font-weight="900" font-family="Segoe UI,Arial">${timerSecs}</text>
+      </svg>
+      <div class="timer-msg">קרא תחילה... ניתן לענות בעוד <span id="timerNum2">${timerSecs}</span> שניות</div>
+    </div>
+    <div id="qAnswers" style="display:none">${btns}</div>
+    <div id="answerResult" style="display:none" class="answer-result"></div>
+  </div>`;
+}
+
+function updateRing(secs,total){
+  const ring=document.getElementById('timerRing');
+  const num=document.getElementById('timerNum');
+  const num2=document.getElementById('timerNum2');
+  if(!ring)return;
+  const circ=163;
+  ring.style.strokeDashoffset=(circ*(1-secs/total)).toString();
+  // color change: green>60%, yellow 30-60%, red <30%
+  const pct=secs/total;
+  ring.style.stroke=pct>0.6?'#6bffb8':pct>0.3?'#f7c948':'#ff6b6b';
+  if(num)num.textContent=secs;
+  if(num2)num2.textContent=secs;
+}
+
+function selectAnswer(chosen,correct,fullPts){
+  if(_lAnswered)return; // ONE-TIME ONLY
+  _lAnswered=true;
+  // Disable all buttons
+  document.querySelectorAll('.answer-btn').forEach((b,i)=>{
+    b.style.pointerEvents='none';
+    if(i===correct)b.classList.add('correct');
+    else if(i===chosen)b.classList.add('wrong');
+    else b.classList.add('disabled');
+  });
+  const res=document.getElementById('answerResult');
+  res.style.display='';
+  if(chosen===correct){
+    _lpts=fullPts;
+    res.className='answer-result ok';
+    res.textContent=`✅ נכון מאוד! קיבלת ${fullPts} נקודות מלאות!`;
+  }else{
+    _lpts=5;
+    res.className='answer-result nok';
+    res.textContent=`❌ לא נכון – התשובה הנכונה מסומנת בירוק. קיבלת 5 נקודות על הקריאה.`;
+  }
+  document.getElementById('mConfirm').style.display='';
+}
+
+function closeModal(id){
+  clearInterval(_timerInt);
+  document.getElementById(id).classList.remove('open');
+}
+function closeModalBg(e,id){if(e.target===document.getElementById(id)){clearInterval(_timerInt);document.getElementById(id).classList.remove('open');}}
+
+function confirmLearn(){
+  closeModal('learnModal');
+  if(_ltid){completeTask(_ltid,_lpts);}
+  _ltid=null;
+}
+
+// ── Speak ──
+function speakText(text){
+  if(!window.speechSynthesis){alert('הדפדפן שלך לא תומך בהשמעת קול');return;}
+  window.speechSynthesis.cancel();
+  function doSpeak(){
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang='he-IL';utt.rate=0.82;utt.pitch=1;
+    const voices=window.speechSynthesis.getVoices();
+    const heb=voices.find(v=>v.lang&&v.lang.startsWith('he'))
+              ||voices.find(v=>v.lang&&v.lang.startsWith('ar')) // Arabic as fallback (Semitic)
+              ||voices[0];
+    if(heb)utt.voice=heb;
+    utt.onstart=()=>{const b=document.getElementById('speakBtn');if(b)b.textContent='🔊 מנגן...';};
+    utt.onend=()=>{const b=document.getElementById('speakBtn');if(b)b.textContent='🔊 האזן';};
+    utt.onerror=()=>{const b=document.getElementById('speakBtn');if(b)b.textContent='🔊 האזן';};
+    window.speechSynthesis.speak(utt);
+  }
+  // Voices may not be loaded yet – wait if needed
+  if(window.speechSynthesis.getVoices().length>0){doSpeak();}
+  else{window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};}
+}
+
+// ── Pasuk ──
+function revealPasuk(hidden,pts){
+  document.getElementById('pasukReveal').style.display='';
+  document.getElementById('pasukHiddenWords').textContent=hidden;
+  document.getElementById('pasukBtns').style.display='flex';
+  speakText(hidden);
+}
+function confirmPasukYes(pts){
+  closeModal('learnModal');
+  if(_ltid)completeTask(_ltid,pts);
+  _ltid=null;
+}
+function confirmPasukNo(){
+  closeModal('learnModal');
+  if(_ltid)completeTask(_ltid,5);
+  _ltid=null;
+}
+
+// ============================================================
+// SPORT MODAL
+// ============================================================
+let _st=null,_sc=0;
+function openSportModal(t){_st=t;_sc=0;document.getElementById('smIcon').textContent=t.sport.emoji;document.getElementById('smTitle').textContent=t.name;document.getElementById('smCount').textContent='0';document.getElementById('smTarget').textContent=`מתוך ${t.sport.target} ${t.sport.unit}`;document.getElementById('smBar').style.width='0%';const b=document.getElementById('smDone');b.style.opacity='.35';b.style.pointerEvents='none';document.getElementById('sportModal').classList.add('open');}
+function tapSport(){if(!_st)return;_sc++;const pct=Math.min(100,Math.round(_sc/_st.sport.target*100));document.getElementById('smCount').textContent=_sc;document.getElementById('smBar').style.width=pct+'%';const c=document.getElementById('smCount');c.style.transform='scale(1.22)';setTimeout(()=>c.style.transform='scale(1)',150);if(_sc>=_st.sport.target){const b=document.getElementById('smDone');b.style.opacity='1';b.style.pointerEvents='auto';}}
+function confirmSport(){closeModal('sportModal');if(_st)completeTask(_st.id,_st.pts);_st=null;}
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+function renderLB(){const us=getUsers();const me=cur();const list=Object.entries(us).map(([un,u])=>({un,name:u.name,pts:u.totalPts||0,rank:getRank(u.totalPts||0)})).sort((a,b)=>b.pts-a.pts);const podium=document.getElementById('podium');podium.innerHTML='';const order=[1,0,2],cl=['p2','p1','p3'],medals=['🥇','🥈','🥉'],colors=['#00b4d8','#f7c948','#cd7f32'];order.forEach((idx,j)=>{if(!list[idx])return;const item=list[idx];const div=document.createElement('div');div.className='podium-item '+cl[j];div.innerHTML=`<div style="font-size:17px">${medals[idx]}</div><div class="podium-av" style="background:linear-gradient(135deg,${colors[j]},${colors[j]}99)">${item.name[0]}</div><div class="podium-name">${item.name.split(' ')[0]}</div><div class="podium-pts">${item.pts} נק׳</div><div class="podium-block"></div>`;podium.appendChild(div);});const lb=document.getElementById('lbList');lb.innerHTML='';if(!list.length){lb.innerHTML='<div style="text-align:center;padding:26px;color:var(--muted)">אין עדיין משתמשים</div>';return;}list.forEach((item,i)=>{if(i<3)return;const div=document.createElement('div');div.className='lb-item'+(item.un===me?' me':'');div.innerHTML=`<div class="lb-rank">${i+1}</div><div class="lb-avatar" style="background:linear-gradient(135deg,#00b4d8,#0077aa)">${item.name[0]}</div><div class="lb-info"><div class="lb-name">${item.name}${item.un===me?' (אני)':''}</div><div class="lb-rank-name">${item.rank.icon} ${item.rank.name}</div></div><div class="lb-pts">${item.pts}</div>`;lb.appendChild(div);});if(list.length<=3)lb.innerHTML='<div style="text-align:center;padding:12px;color:var(--muted);font-size:11px">המשתמשים הראשונים מוצגים בפודיום</div>';}
+
+// ============================================================
+// PROFILE
+// ============================================================
+function renderProfile(){const un=cur();const u=getUD(un);if(!u)return;const rk=getRank(u.totalPts||0);document.getElementById('profAvatar').textContent=(u.name||'?')[0];document.getElementById('profName').textContent=u.name;document.getElementById('profRankIcon').textContent=rk.icon;document.getElementById('profRankName').textContent=rk.name;document.getElementById('statTotal').textContent=u.totalPts||0;document.getElementById('statDays').textContent=u.activeDays||0;document.getElementById('statTasks').textContent=u.tasksCompleted||0;document.getElementById('statStreak').textContent=u.streak||0;const rl=document.getElementById('ranksList');rl.innerHTML='';RANKS.forEach(r=>{const cr=rk.name===r.name;const dn=(u.totalPts||0)>=r.min;const row=document.createElement('div');row.className='rank-row'+(cr?' current':'');row.innerHTML=`<span style="font-size:16px">${r.icon}</span><div class="r-name">${r.name}</div><div class="r-req">${r.min} נק׳</div><div style="font-size:13px">${dn?'✅':''}</div>`;rl.appendChild(row);});}
+
+// ============================================================
+// UI
+// ============================================================
+let _tt;
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+(type||'');clearTimeout(_tt);_tt=setTimeout(()=>t.className='',2200);}
+function showRankUp(rk){document.getElementById('ruIcon').textContent=rk.icon;document.getElementById('ruText').textContent=`הגעת לדרגת "${rk.name}"! 🎉`;document.getElementById('rankUp').classList.add('show');}
+function showCelebration(el){if(!el)return;const rect=el.getBoundingClientRect();const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;const colors=['#f7c948','#ff8c42','#6bffb8','#00b4d8','#ff6b6b','#a855f7'];for(let i=0;i<14;i++){const dot=document.createElement('div');dot.className='confetti-dot';dot.style.cssText=`left:${cx}px;top:${cy}px;background:${colors[i%colors.length]};--tx:${(Math.random()-.5)*130}px;--ty:${(Math.random()-1)*110}px;`;document.body.appendChild(dot);dot.addEventListener('animationend',()=>dot.remove());}}
+
+// ============================================================
+// ADMIN MODE
+// ============================================================
+// ── Admin tab switch ──
+function showAdminTab(tab){
+  document.getElementById('atab1').classList.toggle('active',tab==='students');
+  document.getElementById('atab2').classList.toggle('active',tab==='graphs');
+  document.getElementById('adminTabStudents').style.display=tab==='students'?'':'none';
+  document.getElementById('adminTabGraphs').style.display=tab==='graphs'?'':'none';
+  if(tab==='graphs')renderAdminGraphs();
+}
+
+// ── Collect student data ──
+function collectStudents(){
+  const users=getUsers();const today=todayKey();
+  // show ALL users except __admin__ key
+  return Object.entries(users)
+    .filter(([un,u])=>un!=='__admin__'&&u&&u.name)
+    .map(([un,u])=>{
+      const dd=(u.days&&u.days[today])||{checked:{},bonusDone:false};
+      let doneTasks=0,todayPts=0,totalTasks=0;
+      CATEGORIES.forEach(cat=>cat.tasks.forEach(t=>{totalTasks++;if(dd.checked[t.id]){doneTasks++;todayPts+=t.pts;}}));
+      if(dd.bonusDone){doneTasks++;todayPts+=dailyBonus().pts;}totalTasks++;
+      return{un,name:u.name||un,cls:u.cls||'',totalPts:u.totalPts||0,rank:getRank(u.totalPts||0),streak:u.streak||0,doneTasks,totalTasks,todayPts,dd,activeDays:u.activeDays||0,tasksCompleted:u.tasksCompleted||0};
+    }).sort((a,b)=>b.totalPts-a.totalPts);
+}
+
+async function enterAdminMode(){
+  ['authScreen','mainScreen'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('adminScreen').classList.add('active');
+  document.getElementById('adminDate').textContent=`יום ${HEB_DAYS[new Date().getDay()]} · ${getHD()}`;
+  // אם יש Firebase — טען את כל המשתמשים מהענן ומזג עם הלוקאל
+  if(FB_URL){
+    document.getElementById('adminTabStudents').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">⏳ טוען נתונים מהענן...</div>';
+    document.getElementById('adminTabStudents').style.display='';
+    try{
+      const fbUsers=await fbGetAllUsers();
+      if(fbUsers){
+        const local=getUsers();
+        // מזג: Firebase גובר על לוקאל לגבי משתמשים מרוחקים
+        Object.entries(fbUsers).forEach(([un,u])=>{
+          if(!local[un]&&u&&u.name){
+            // משתמש רחוק — בנה מבנה מינימלי
+            local[un]={name:u.name,cls:u.cls||'',pass:u.pass||'',
+              totalPts:u.totalPts||0,tasksCompleted:u.tasksCompleted||0,
+              activeDays:u.activeDays||0,streak:u.streak||0,lastDay:u.lastDay||'',
+              days:u.todayData?{[todayKey()]:u.todayData}:{}};
+          } else if(local[un]&&u){
+            // עדכן נתונים כלליים אם Firebase חדש יותר
+            if((u.totalPts||0)>(local[un].totalPts||0)){local[un].totalPts=u.totalPts;}
+            if(u.todayData&&(!local[un].days||!local[un].days[todayKey()])){
+              if(!local[un].days)local[un].days={};
+              local[un].days[todayKey()]=u.todayData;
+            }
+          }
+        });
+        saveUsers(local);
+      }
+    }catch(e){console.warn('Firebase fetch error',e);}
+  }
+  renderAdmin();
+  // הצג כפתור הגדרת Firebase אם לא מוגדר
+  if(!FB_URL){
+    const notice=document.querySelector('.admin-notice');
+    if(notice)notice.innerHTML+='<br><br>🔴 <b>Firebase לא מחובר</b> — רק משתמשים מהמכשיר הזה מוצגים.<br><a onclick="promptFbUrl()" style="color:#f7c948;cursor:pointer;text-decoration:underline">לחץ כאן לחיבור Firebase</a>';
+  }
+}
+
+function doLogout(){
+  setCur('');
+  ['mainScreen','adminScreen'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('authScreen').classList.add('active');
+}
+
+function promptFbUrl(){
+  const url=prompt('הכנס את כתובת Firebase Realtime Database שלך:\n(דוגמה: https://my-project-default-rtdb.firebaseio.com)');
+  if(url&&url.startsWith('https://')){
+    localStorage.setItem('ak_fb_url',url.trim().replace(/\/$/,''));
+    alert('✅ Firebase חובר! רענן את הדף.');
+    location.reload();
+  } else if(url){
+    alert('❌ כתובת לא תקינה. חייבת להתחיל ב-https://');
+  }
+}
+
+function renderAdmin(){
+  document.getElementById('adminTabGraphs').innerHTML='';
+  document.getElementById('adminTabGraphs').style.display='none';
+  document.getElementById('atab1').classList.add('active');
+  document.getElementById('atab2').classList.remove('active');
+  document.getElementById('adminTabStudents').style.display='';
+
+  const students=collectStudents();
+  const today=todayKey();
+  const users=getUsers();
+  const totalStudents=students.length;
+  const activeToday=students.filter(s=>s.doneTasks>0).length;
+  const totalTasksToday=students.reduce((s,st)=>s+st.doneTasks,0);
+
+  const avatarColors=['#f7c948','#6bffb8','#00b4d8','#ff8c42','#a855f7','#ff6b6b','#38bdf8','#fb923c'];
+
+  let html=`
+    <div class="admin-notice">🔒 מסך זה גלוי למנהל/מורה בלבד · סיסמה: <b>admin123</b></div>
+    <div class="admin-summary">
+      <div class="admin-stat"><div class="as-val">${totalStudents}</div><div class="as-lbl">תלמידים רשומים</div></div>
+      <div class="admin-stat"><div class="as-val">${activeToday}</div><div class="as-lbl">פעילים היום</div></div>
+      <div class="admin-stat"><div class="as-val">${totalTasksToday}</div><div class="as-lbl">משימות היום</div></div>
+    </div>
+    <div class="admin-section-title">🏅 דירוג תלמידים</div>`;
+
+  if(!students.length){
+    html+=`<div style="text-align:center;padding:40px;color:var(--muted)">אין תלמידים רשומים עדיין</div>`;
+  } else {
+    students.forEach((s,i)=>{
+      const posClass=i===0?'top1':i===1?'top2':i===2?'top3':'';
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
+      const avatarColor=avatarColors[i%avatarColors.length];
+      const pct=s.totalTasks?Math.round(s.doneTasks/s.totalTasks*100):0;
+
+      // Build task rows for expanded view
+      let taskRows='';
+      CATEGORIES.forEach(cat=>{
+        const catDone=cat.tasks.filter(t=>s.dd.checked[t.id]);
+        if(catDone.length===0&&!s.dd.bonusDone&&cat.id!=='prayer')return; // skip empty categories in detail
+        taskRows+=`<div class="sc-detail-title">${cat.icon} ${cat.title}</div>`;
+        cat.tasks.forEach(t=>{
+          const done=!!s.dd.checked[t.id];
+          taskRows+=`<div class="sc-task-row">
+            <span class="sc-task-check">${done?'✅':'⬜'}</span>
+            <span class="sc-task-name${done?' done':''}">${t.name}</span>
+            ${done?`<span class="sc-task-pts">+${t.pts}</span>`:''}
+          </div>`;
+        });
+      });
+      // bonus
+      taskRows+=`<div class="sc-detail-title">⭐ בונוס יומי</div>
+        <div class="sc-task-row">
+          <span class="sc-task-check">${s.dd.bonusDone?'✅':'⬜'}</span>
+          <span class="sc-task-name${s.dd.bonusDone?' done':''}">משימת בונוס</span>
+          ${s.dd.bonusDone?`<span class="sc-task-pts">+${dailyBonus().pts}</span>`:''}
+        </div>`;
+
+      html+=`
+        <div class="student-card ${posClass}" onclick="toggleStudentDetail('sd_${i}')">
+          <div class="sc-main">
+            <div class="sc-pos">${medal}</div>
+            <div class="sc-avatar" style="background:linear-gradient(135deg,${avatarColor},${avatarColor}99)">${s.name[0]}</div>
+            <div class="sc-info">
+              <div class="sc-name">${s.name}</div>
+              <div class="sc-meta">${s.rank.icon} ${s.rank.name} · כיתה ${s.cls} · סטריק ${s.streak} 🔥</div>
+              <div style="margin-top:4px">
+                <div style="background:rgba(255,255,255,0.07);border-radius:100px;height:5px;overflow:hidden;width:100%">
+                  <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:100px;"></div>
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">${s.doneTasks}/${s.totalTasks} משימות היום · ${s.todayPts} נק' היום</div>
+              </div>
+            </div>
+            <div class="sc-right">
+              <div class="sc-pts">${s.totalPts}</div>
+              <div class="sc-tasks">סה"כ נק'</div>
+              <div style="font-size:18px;margin-top:2px;color:var(--muted)">▾</div>
+            </div>
+          </div>
+          <div class="sc-detail" id="sd_${i}">${taskRows}</div>
+        </div>`;
+    });
+  }
+
+  document.getElementById('adminTabStudents').innerHTML=html;
+}
+
+// ============================================================
+// ADMIN GRAPHS
+// ============================================================
+function renderAdminGraphs(){
+  const students=collectStudents();
+  if(!students.length){document.getElementById('adminTabGraphs').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">אין תלמידים רשומים</div>';return;}
+
+  // ── 1. Category completion rates ──
+  const catColors=['#00b4d8','#9b59b6','#f7c948','#ff8c42','#6bffb8'];
+  const catStats=CATEGORIES.map((cat,ci)=>{
+    let total=0,done=0;
+    students.forEach(s=>{cat.tasks.forEach(t=>{total++;if(s.dd.checked[t.id])done++;});});
+    const pct=total?Math.round(done/total*100):0;
+    return{name:cat.title,icon:cat.icon,pct,done,total,color:catColors[ci]||'#888'};
+  });
+
+  // ── 2. Task insights – top done & most skipped ──
+  const taskStats=[];
+  CATEGORIES.forEach(cat=>{
+    cat.tasks.forEach(t=>{
+      const cnt=students.filter(s=>s.dd.checked[t.id]).length;
+      const pct=students.length?Math.round(cnt/students.length*100):0;
+      taskStats.push({name:t.name,cat:cat.title,catIcon:cat.icon,cnt,pct});
+    });
+  });
+  taskStats.sort((a,b)=>b.pct-a.pct);
+  const topDone=taskStats.slice(0,5);
+  const topSkip=[...taskStats].sort((a,b)=>a.pct-b.pct).slice(0,5);
+
+  // ── 3. Radar data per student (5 categories) ──
+  function studentCatPct(s){
+    return CATEGORIES.map(cat=>{
+      const done=cat.tasks.filter(t=>s.dd.checked[t.id]).length;
+      return cat.tasks.length?Math.round(done/cat.tasks.length*100):0;
+    });
+  }
+  function svgRadar(vals,labels,color){
+    const n=vals.length,cx=110,cy=100,r=75;
+    const pt=(i,v)=>{const a=(i*2*Math.PI/n)-Math.PI/2;const d=v/100*r;return[cx+d*Math.cos(a),cy+d*Math.sin(a)];};
+    const labelPt=(i)=>{const a=(i*2*Math.PI/n)-Math.PI/2;const d=r+18;return[cx+d*Math.cos(a),cy+d*Math.sin(a)];};
+    const grids=[20,40,60,80,100].map(v=>`<polygon points="${Array.from({length:n},(_,i)=>pt(i,v).join(',')).join(' ')}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`).join('');
+    const axes=Array.from({length:n},(_,i)=>{const[x,y]=pt(i,100);return`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;}).join('');
+    const poly=`<polygon points="${vals.map((v,i)=>pt(i,v).join(',')).join(' ')}" fill="${color}33" stroke="${color}" stroke-width="2"/>`;
+    const dots=vals.map((v,i)=>{const[x,y]=pt(i,v);return`<circle cx="${x}" cy="${y}" r="3" fill="${color}"/>`;}).join('');
+    const lbls=labels.map((l,i)=>{const[x,y]=labelPt(i);const pct=vals[i];return`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="rgba(255,255,255,0.55)" font-size="9" font-family="Segoe UI,Arial">${l}</text>`;}).join('');
+    const pctLbls=vals.map((v,i)=>{if(v===0)return'';const[x,y]=pt(i,v);return`<text x="${x}" y="${y-6}" text-anchor="middle" fill="${color}" font-size="9" font-weight="bold" font-family="Segoe UI,Arial">${v}%</text>`;}).join('');
+    return`<svg width="220" height="200" viewBox="0 0 220 200">${grids}${axes}${poly}${dots}${pctLbls}${lbls}</svg>`;
+  }
+
+  // ── 4. Heat map ──
+  const avatarColors=['#f7c948','#6bffb8','#00b4d8','#ff8c42','#a855f7','#ff6b6b'];
+  const catShort=['תפילות','תורה','לימודים','ספורט','חסד'];
+  function hmColor(pct){
+    if(pct>=75)return{bg:'rgba(107,255,184,0.25)',color:'#6bffb8'};
+    if(pct>=40)return{bg:'rgba(247,201,72,0.2)',color:'#f7c948'};
+    return{bg:'rgba(255,107,107,0.18)',color:'#ff8080'};
+  }
+
+  // ── 5. Class comparison ──
+  const classMap={};
+  students.forEach(s=>{
+    const cl=s.cls||'לא ידוע';
+    if(!classMap[cl])classMap[cl]={students:[],totalPts:0,todayDone:0,todayTotal:0,catDone:{}};
+    classMap[cl].students.push(s);
+    classMap[cl].totalPts+=s.totalPts;
+    classMap[cl].todayDone+=s.doneTasks;
+    classMap[cl].todayTotal+=s.totalTasks;
+    CATEGORIES.forEach((cat,ci)=>{
+      if(!classMap[cl].catDone[ci])classMap[cl].catDone[ci]={done:0,total:0};
+      cat.tasks.forEach(t=>{classMap[cl].catDone[ci].total++;if(s.dd.checked[t.id])classMap[cl].catDone[ci].done++;});
+    });
+  });
+  const classList=Object.entries(classMap).map(([name,d])=>({
+    name,count:d.students.length,
+    avgPts:Math.round(d.totalPts/d.students.length),
+    todayPct:d.todayTotal?Math.round(d.todayDone/d.todayTotal*100):0,
+    catPcts:CATEGORIES.map((_,ci)=>d.catDone[ci]?Math.round(d.catDone[ci].done/d.catDone[ci].total*100):0),
+    strongCat:null,weakCat:null
+  }));
+  classList.forEach(cl=>{
+    let maxI=0,minI=0;
+    cl.catPcts.forEach((v,i)=>{if(v>cl.catPcts[maxI])maxI=i;if(v<cl.catPcts[minI])minI=i;});
+    cl.strongCat=CATEGORIES[maxI];cl.weakCat=CATEGORIES[minI];
+  });
+  classList.sort((a,b)=>b.avgPts-a.avgPts);
+
+  // ── BUILD HTML ──
+  let html='';
+
+  // ── CLASS RANKING ──
+  html+=`<div class="graph-section" style="border-color:rgba(107,255,184,0.2);background:rgba(107,255,184,0.04)">
+    <div class="graph-title">🏫 דירוג כיתות – חומר הנלמד</div>`;
+
+  if(classList.length<2){
+    html+=`<div style="text-align:center;color:var(--muted);font-size:13px;padding:10px">נדרשים תלמידים מכיתות שונות להשוואה</div>`;
+  } else {
+    const medals=['🥇','🥈','🥉'];
+    classList.forEach((cl,i)=>{
+      const medal=medals[i]||`${i+1}.`;
+      const isTop=i===0;
+      html+=`<div style="background:${isTop?'rgba(107,255,184,0.08)':'rgba(255,255,255,0.03)'};border:1px solid ${isTop?'rgba(107,255,184,0.25)':'rgba(255,255,255,0.07)'};border-radius:14px;padding:13px;margin-bottom:9px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:20px">${medal}</span>
+          <div style="flex:1">
+            <div style="font-weight:900;font-size:16px;color:${isTop?'var(--green)':'var(--text)'}">כיתה ${cl.name}</div>
+            <div style="font-size:11px;color:var(--muted)">${cl.count} תלמידים · ממוצע ${cl.avgPts} נק׳ · השלמה היום: ${cl.todayPct}%</div>
+          </div>
+          <div style="text-align:center;flex-shrink:0">
+            <div style="font-size:22px;font-weight:900;color:${isTop?'var(--green)':'var(--gold)'}">${cl.avgPts}</div>
+            <div style="font-size:10px;color:var(--muted)">נק' ממוצע</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:8px">
+          ${cl.catPcts.map((p,ci)=>{
+            const c=p>=75?'var(--green)':p>=40?'var(--gold)':'#ff8080';
+            return`<div style="text-align:center">
+              <div style="font-size:16px">${CATEGORIES[ci].icon}</div>
+              <div style="font-size:11px;font-weight:800;color:${c}">${p}%</div>
+              <div style="background:rgba(255,255,255,0.07);border-radius:4px;height:5px;margin-top:3px;overflow:hidden">
+                <div style="height:100%;width:${p}%;background:${c};border-radius:4px"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;gap:8px;font-size:11px">
+          <span style="background:rgba(107,255,184,0.1);color:var(--green);padding:4px 9px;border-radius:20px">💪 חזקה ב: ${cl.strongCat.icon} ${cl.strongCat.title}</span>
+          <span style="background:rgba(255,107,107,0.1);color:#ff8080;padding:4px 9px;border-radius:20px">⚠️ חלשה ב: ${cl.weakCat.icon} ${cl.weakCat.title}</span>
+        </div>
+      </div>`;
+    });
+  }
+  html+=`</div>`;
+
+  // Cat bars
+  html+=`<div class="graph-section"><div class="graph-title">📊 השלמת משימות לפי קטגוריה – היום</div>`;
+  catStats.forEach(c=>{
+    html+=`<div class="cat-bar-row">
+      <div class="cat-bar-label"><span class="cat-bar-name">${c.icon} ${c.name}</span><span class="cat-bar-pct" style="color:${c.color}">${c.pct}%</span></div>
+      <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${c.pct}%;background:${c.color}"></div></div>
+    </div>`;
+  });
+  html+=`</div>`;
+
+  // Task insights
+  html+=`<div class="graph-section"><div class="graph-title">💡 חוזקות וחולשות – משימות</div>
+    <div class="insight-cols">
+      <div>
+        <div class="insight-col-title strong">✅ הכי נעשות</div>`;
+  topDone.forEach(t=>{
+    html+=`<div class="task-insight-row">
+      <div class="task-insight-name">${t.catIcon} ${t.name}</div>
+      <div class="task-insight-bar"><div class="task-insight-fill" style="width:${t.pct}%;background:var(--green)"></div></div>
+      <div class="task-insight-num" style="color:var(--green)">${t.pct}%</div>
+    </div>`;
+  });
+  html+=`</div><div>
+        <div class="insight-col-title weak">❌ הכי מדולגות</div>`;
+  topSkip.forEach(t=>{
+    html+=`<div class="task-insight-row">
+      <div class="task-insight-name">${t.catIcon} ${t.name}</div>
+      <div class="task-insight-bar"><div class="task-insight-fill" style="width:${t.pct}%;background:#ff8080"></div></div>
+      <div class="task-insight-num" style="color:#ff8080">${t.pct}%</div>
+    </div>`;
+  });
+  html+=`</div></div></div>`;
+
+  // Radar charts
+  html+=`<div class="graph-section"><div class="graph-title">🕸️ גרף עכביש – פרופיל תלמיד</div><div class="radar-grid">`;
+  const radarColors=['#f7c948','#6bffb8','#00b4d8','#ff8c42','#a855f7','#ff6b6b'];
+  students.forEach((s,i)=>{
+    const vals=studentCatPct(s);
+    const avg=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+    html+=`<div class="radar-card">
+      <div class="radar-name">${s.name} <span style="color:${radarColors[i%radarColors.length]};font-size:11px">(${avg}% ממוצע)</span></div>
+      ${svgRadar(vals,catShort,radarColors[i%radarColors.length])}
+    </div>`;
+  });
+  html+=`</div></div>`;
+
+  // Heat map
+  html+=`<div class="graph-section"><div class="graph-title">🌡️ מפת חום – תלמיד × קטגוריה</div>
+    <div class="heatmap-wrap"><table class="heatmap"><thead><tr>
+      <th>תלמיד</th>${catShort.map(c=>`<th>${c}</th>`).join('')}<th>סה"כ</th>
+    </tr></thead><tbody>`;
+  students.forEach((s,i)=>{
+    const vals=studentCatPct(s);
+    const avg=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+    const{bg:avgBg,color:avgC}=hmColor(avg);
+    html+=`<tr><td>${s.name}</td>`;
+    vals.forEach(v=>{const{bg,color}=hmColor(v);html+=`<td><div class="hm-cell" style="background:${bg};color:${color}">${v}%</div></td>`;});
+    html+=`<td><div class="hm-cell" style="background:${avgBg};color:${avgC};font-size:12px">${avg}%</div></td></tr>`;
+  });
+  html+=`</tbody></table></div></div>`;
+
+  document.getElementById('adminTabGraphs').innerHTML=html;
+}
+
+function toggleStudentDetail(id){
+  const el=document.getElementById(id);
+  if(el)el.classList.toggle('open');
+}
+
+</script>
+</body>
+</html>
