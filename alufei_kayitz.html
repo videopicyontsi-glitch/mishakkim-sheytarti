@@ -1196,20 +1196,34 @@ function speakText(text){
   }
   const cleanedText=cleanForSpeech(text);
   function doSpeak(){
-    const utt=new SpeechSynthesisUtterance(cleanedText);
-    utt.lang='he-IL';utt.rate=0.82;utt.pitch=1;
-    const voices=window.speechSynthesis.getVoices();
-    const heb=voices.find(v=>v.lang&&v.lang.startsWith('he'))
-              ||voices.find(v=>v.lang&&v.lang.startsWith('ar'))
-              ||voices[0];
-    if(heb)utt.voice=heb;
-    utt.onstart=()=>{document.querySelectorAll('#speakBtn').forEach(b=>{b.textContent='⏹ עצור';b.style.background='rgba(255,107,107,0.15)';});};
-    utt.onend=()=>{document.querySelectorAll('#speakBtn').forEach(b=>{b.textContent='🔊 האזן';b.style.background='rgba(0,180,216,0.1)';});};
-    utt.onerror=()=>{document.querySelectorAll('#speakBtn').forEach(b=>{b.textContent='🔊 האזן';b.style.background='rgba(0,180,216,0.1)';});};
-    window.speechSynthesis.speak(utt);
+    // iOS fix: cancel first then small delay
+    window.speechSynthesis.cancel();
+    setTimeout(()=>{
+      const utt=new SpeechSynthesisUtterance(cleanedText);
+      utt.lang='he-IL';utt.rate=0.8;utt.pitch=1;utt.volume=1;
+      const voices=window.speechSynthesis.getVoices();
+      const heb=voices.find(v=>v.lang&&v.lang.startsWith('he'))
+                ||voices.find(v=>v.lang&&v.lang.startsWith('ar'))
+                ||voices[0];
+      if(heb)utt.voice=heb;
+      utt.onstart=()=>{document.querySelectorAll('#speakBtn').forEach(b=>{b.textContent='⏹ עצור';b.style.background='rgba(255,107,107,0.15)';});};
+      utt.onend=()=>{document.querySelectorAll('#speakBtn').forEach(b=>{b.textContent='🔊 האזן';b.style.background='rgba(0,180,216,0.1)';});};
+      utt.onerror=(e)=>{
+        document.querySelectorAll('#speakBtn').forEach(b=>{b.textContent='🔊 האזן';b.style.background='rgba(0,180,216,0.1)';});
+        if(e.error!=='interrupted')alert('לא ניתן להשמיע — נסה בדפדפן Chrome');
+      };
+      window.speechSynthesis.speak(utt);
+      // iOS keepalive fix
+      const keepAlive=setInterval(()=>{
+        if(!window.speechSynthesis.speaking){clearInterval(keepAlive);return;}
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      },10000);
+    },100);
   }
-  if(window.speechSynthesis.getVoices().length>0){doSpeak();}
-  else{window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();};}
+  const voices=window.speechSynthesis.getVoices();
+  if(voices.length>0){doSpeak();}
+  else{window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.onvoiceschanged=null;doSpeak();}; setTimeout(doSpeak,500);}
 }
 
 // ── Pasuk ──
